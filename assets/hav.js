@@ -181,11 +181,11 @@ export function skapaHav(hero, { farger = {}, lasText = true, rubrik = 'h1', for
 					c = mix(c, mix(uDjup, uSpridning, 0.55), dis * 0.6);
 				}
 
-				// Mörkare där texten står, mot nederkanten och upptill bakom menyn.
+				// Mörkare där texten står och mot nederkanten. Menyn ligger ovanför heron, så toppen behöver bara lite djup.
 				vec2 ut = vec2(max(max(uBox.x - uv.x, uv.x - uBox.z), 0.0), max(max(uBox.y - uv.y, uv.y - uBox.w), 0.0));
 				ut.y *= uRes.y / uRes.x;
 				float iText = 1.0 - smoothstep(0.0, 0.22, length(ut));
-				float skugga = iText * 0.52 + smoothstep(0.4, 0.0, uv.y) * 0.38 + smoothstep(0.78, 1.0, uv.y) * 0.5;
+				float skugga = iText * 0.52 + smoothstep(0.4, 0.0, uv.y) * 0.38 + smoothstep(0.82, 1.0, uv.y) * 0.12;
 				// Skuggan tonas i vattnets egen färg (blått vatten ger blå skugga).
 				vec3 ton = uDjup / max(max(uDjup.r, uDjup.g), max(uDjup.b, 0.001));
 				vec3 skuggfarg = clamp(0.38 + 0.5 * ton, 0.0, 1.0);
