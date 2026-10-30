@@ -60,10 +60,20 @@
 						resten.push(el);
 					}
 				});
-				var legend = hero.querySelectorAll('.e-grid-base > *');
-				gsap.from(resten, { y: 22, autoAlpha: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, delay: 0.35 });
+				var legend = Array.prototype.slice.call(hero.querySelectorAll('.e-grid-base > *'));
+				// Elementors behållare har en CSS-övergång på transform som annars låser
+				// GSAP-rörelsen halvvägs. Stäng av den under introt och städa efteråt.
+				var utanOvergang = function (els) {
+					els.forEach(function (el) {
+						el.style.transition = 'none';
+					});
+				};
+				var stada = { clearProps: 'transform,transition' };
+				utanOvergang(resten);
+				utanOvergang(legend);
+				gsap.fromTo(resten, { y: 22, autoAlpha: 0 }, Object.assign({ y: 0, autoAlpha: 1, duration: 0.9, ease: 'power3.out', stagger: 0.08, delay: 0.35 }, stada));
 				if (legend.length) {
-					gsap.from(legend, { y: 14, autoAlpha: 0, duration: 0.8, ease: 'power3.out', stagger: 0.06, delay: 0.6 });
+					gsap.fromTo(legend, { y: 14, autoAlpha: 0 }, Object.assign({ y: 0, autoAlpha: 1, duration: 0.8, ease: 'power3.out', stagger: 0.06, delay: 0.6 }, stada));
 				}
 			}
 
