@@ -45,9 +45,16 @@ function hjd_hav_forval_grupper() {
 			'Solnedgång' => array( '#1E1530', '#6A3F78', '#5A3E86', '#F07F5A', '#FFB36B' ),
 			'Kvällssol' => array( '#0E1F45', '#2F6FB5', '#3A4F9A', '#F2B48A', '#FFD9A8' ),
 			'Skymning' => array( '#14122E', '#4B3F8C', '#3A2F73', '#B48BC8', '#F2D4F0' ),
-			'Blå timmen' => array( '#071433', '#1F4F9A', '#1B2F6E', '#6E8BD0', '#DCE6FF' ),
 			'Midsommarnatt' => array( '#18243F', '#4D6EA6', '#4A5A92', '#E8B9C4', '#FFF0E6' ),
 			'Månsken' => array( '#050B1C', '#1B3358', '#142446', '#4C6A92', '#E8EEF8' ),
+		),
+		'Blå timmen' => array(
+			'Blå timmen' => array( '#071433', '#1F4F9A', '#1B2F6E', '#6E8BD0', '#DCE6FF' ),
+			'Blå timmen djup' => array( '#040C24', '#173F84', '#12235A', '#5470B8', '#CFDBFF' ),
+			'Blå timmen ljus' => array( '#0B1C45', '#2C66B8', '#2A4290', '#8EA8E3', '#E8EEFF' ),
+			'Blå timmen rosa' => array( '#0A1638', '#2A5099', '#26336F', '#C99AB8', '#FFE4EC' ),
+			'Blå timmen violett' => array( '#0C0F38', '#33459E', '#262A78', '#8478C8', '#E6DEFF' ),
+			'Blå timmen guld' => array( '#071433', '#1F4F9A', '#1B2F6E', '#6E8BD0', '#FFCF85' ),
 		),
 	);
 }
