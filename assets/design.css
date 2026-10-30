@@ -1,0 +1,60 @@
+/* Hjuviks Marina – design och rörelse */
+
+.hjd-hero {
+	position: relative;
+	isolation: isolate;
+}
+
+.hjd-hero > *:not(.hjd-hav) {
+	position: relative;
+	z-index: 1;
+}
+
+/* Havsytan ligger under allt innehåll i heron och tonar fram när den är redo. */
+.hjd-hav {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	display: block;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hjd-hav.is-ready {
+	opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.hjd-hav {
+		transition: none;
+	}
+}
+
+/* Maskade rader i rubrikintrot – plats för å, ä, ö och nedstaplar. */
+.hjd-line-mask {
+	padding-bottom: 0.1em;
+	margin-bottom: -0.1em;
+}
+
+/* Rubriken döljs tills introt startar. Visas ändå efter 2,5 s om något fallerar. */
+@media (prefers-reduced-motion: no-preference) {
+	html.hjd-js .elementor header:has(h1) h1 {
+		visibility: hidden;
+		animation: hjd-visa 0s linear 2.5s forwards;
+	}
+}
+
+@keyframes hjd-visa {
+	to {
+		visibility: visible;
+	}
+}
+
+/* Citatet läses fram – orden får full färg när de scrollas förbi. */
+.hjd-ord {
+	will-change: opacity;
+}
+
