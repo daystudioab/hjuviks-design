@@ -1,6 +1,6 @@
 /* Hjuviks Marina – havsyta i startsidans hero (Three.js).
- * En lugn havsyta sedd snett uppifrån, utan horisont: långsamma
- * dyningar, himmel som speglas i vattnet och ett svagt solglitter.
+ * En lugn havsyta sedd från bryggan, med horisonten strax ovanför
+ * bild: långsamma dyningar, himmel som speglas i vattnet och solglitter.
  * Ingen raymarching – varje pixel räknar ut var blicken träffar
  * vattenplanet och tar normalen från en summa av vågor. */
 import * as THREE from './vendor/three.module.min.js';
@@ -41,7 +41,6 @@ if (hero && webglOk()) {
 		uDjup: { value: col('#002A5E') },
 		uSpridning: { value: col('#0A8BD8') },
 		uMaxVagor: { value: 22 },
-		uSkala: { value: 0.7 },
 		uSol: { value: col('#FFF4DC') },
 	};
 
@@ -63,11 +62,9 @@ if (hero && webglOk()) {
 			uniform vec3 uSpridning;
 			uniform vec3 uSol;
 			uniform int uMaxVagor;
-			uniform float uSkala;
 
 			#define VAGOR 22
-			#define LUTNING 0.95
-			#define HOJD 4.0
+			#define HORISONT 0.60
 
 			// En våg med skarpare krön än en sinus (exp(sin)).
 			vec2 vag(vec2 p, vec2 riktning, float frekvens, float fas) {
@@ -111,7 +108,7 @@ if (hero && webglOk()) {
 				float y = max(d.y, 0.0);
 				vec3 c = mix(uHorisont, uZenit, pow(y, 0.45));
 				float s = max(dot(d, sol), 0.0);
-				c += uSol * pow(s, 48.0) * 0.12;
+				c += uSol * (pow(s, 6.0) * 0.08 + pow(s, 64.0) * 0.3);
 				return c;
 			}
 
@@ -119,21 +116,21 @@ if (hero && webglOk()) {
 				vec2 uv = gl_FragCoord.xy / uRes;
 				vec2 p = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
 
-				// Blicken riktad snett nedåt, så att hela heron är vatten.
-				vec3 rd = normalize(vec3(p.x, p.y - LUTNING, 1.0));
-				vec3 ro = vec3(uTime * 0.02, HOJD + sin(uTime * 0.11) * 0.04, uTime * 0.12);
-				vec3 sol = normalize(vec3(0.55, 0.32, 1.0));
+				// Sedd från bryggan, men horisonten ligger strax ovanför heron – bara vatten syns.
+				vec3 rd = normalize(vec3(p.x, p.y - HORISONT, 1.35));
+				vec3 ro = vec3(uTime * 0.02, 2.2 + sin(uTime * 0.11) * 0.04, uTime * 0.12);
+				vec3 sol = normalize(vec3(0.5, 0.16, 1.0));
 
 				vec3 c;
 				{
 					float t = -ro.y / rd.y;
 					vec2 xz = ro.xz + rd.xz * t;
-					vec2 q = xz * uSkala;
+					vec2 q = xz * 0.32;
 
 					// Färre vågor och mjukare normaler längre bort.
 					float avst = clamp(t / 90.0, 0.0, 1.0);
 					int antal = int(mix(float(uMaxVagor), 8.0, avst));
-					vec4 nh = normal(q, 0.01 + t * 0.0015, 0.85, antal);
+					vec4 nh = normal(q, 0.01 + t * 0.0015, 0.42, antal);
 					vec3 n = normalize(mix(nh.xyz, vec3(0.0, 1.0, 0.0), smoothstep(0.0, 1.0, avst) * 0.85));
 
 					float fresnel = 0.03 + 0.97 * pow(1.0 - max(dot(n, -rd), 0.0), 5.0);
@@ -141,18 +138,16 @@ if (hero && webglOk()) {
 					r.y = abs(r.y);
 
 					float h = nh.w;
-					vec3 vatten = uDjup + uSpridning * (0.14 + 0.8 * pow(h, 2.0)) * (1.0 - avst * 0.6);
-					c = mix(vatten, himmel(r, sol) * 0.85, fresnel * 0.8);
-
-					// Ljus som fångas i vågsidorna, så att dyningarna syns uppifrån.
-					float sida = clamp(dot(n.xz, normalize(sol.xz)), -1.0, 1.0);
-					c += uHorisont * max(sida, 0.0) * 0.55;
-					c *= 1.0 + min(sida, 0.0) * 0.35;
+					vec3 vatten = uDjup + uSpridning * (0.18 + 0.55 * pow(h, 2.0)) * (1.0 - avst * 0.6);
+					c = mix(vatten, himmel(r, sol) * 0.62, fresnel * 0.55);
 
 					// Solglitter.
-					float glitter = pow(max(dot(r, sol), 0.0), 1400.0);
-					c += uSol * glitter * 1.2;
+					float glitter = pow(max(dot(r, sol), 0.0), 900.0);
+					c += uSol * glitter * 1.8;
 
+					// Dis längst bort – mot vattnets egen blå, så att ingen ljus horisontlinje bildas.
+					float dis = 1.0 - exp(-t * 0.012);
+					c = mix(c, mix(uDjup, uSpridning, 0.55), dis * 0.6);
 				}
 
 				// Mörkare där texten står, mot nederkanten och upptill bakom menyn.
@@ -216,8 +211,6 @@ if (hero && webglOk()) {
 		let pr = Math.min(window.devicePixelRatio || 1, 1.5);
 		const liten = w < 768;
 		uniforms.uMaxVagor.value = liten ? 14 : 22;
-		// Smal skärm visar ett smalare utsnitt – tätare vågor så att skalan känns lika.
-		uniforms.uSkala.value = Math.max(0.7, 0.7 * 1.6 * h / Math.max(w, 1));
 		const maxPx = liten ? 0.8e6 : 1.6e6;
 		if (w * h * pr * pr > maxPx) {
 			pr = Math.max(0.5, Math.sqrt(maxPx / (w * h)));
