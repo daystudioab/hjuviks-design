@@ -5,8 +5,9 @@ WordPress-tillägg för hjuviksmarina.se. Byggt av Studio Day.
 ## Ny version
 
 1. Höj `Version:` i `hjuviks-design.php` (och versionskonstanten under).
-2. Committa och tagga med samma nummer, t.ex. `git tag -a v1.2.3 -m "Vad som ändrats"`, och pusha taggen.
-3. GitHub Actions bygger `hjuviks-design.zip` och publicerar en release.
+2. Committa och pusha till `main`. Commit-meddelandet blir releasens anteckningar.
+3. GitHub Actions ser att versionen är ny, bygger `hjuviks-design.zip` och publicerar releasen `v` + versionsnumret.
+   Ändringar utan ny version ger ingen release.
 4. Sajten visar uppdateringen under **Tillägg** (kollar var 12:e timme, eller direkt via länken *Sök efter uppdateringar* på tilläggets rad).
 
 ## Publikt repo
