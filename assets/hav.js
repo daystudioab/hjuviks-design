@@ -5,8 +5,18 @@
  * vattenplanet och tar normalen från en summa av vågor. */
 import * as THREE from './vendor/three.module.min.js';
 
-const hero = document.querySelector('.elementor header:has(h1)');
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Standardfärgerna. Kan ändras under Utseende → Havsyta (window.HJD_HAV.farger).
+export const STANDARD = {
+	djup: '#002A5E',
+	spridning: '#0A8BD8',
+	zenit: '#1466D2',
+	horisont: '#7FC2F0',
+	sol: '#FFF4DC',
+};
+
+const UNIFORM = { djup: 'uDjup', spridning: 'uSpridning', zenit: 'uZenit', horisont: 'uHorisont', sol: 'uSol' };
 
 function webglOk() {
 	try {
@@ -17,7 +27,16 @@ function webglOk() {
 	}
 }
 
-if (hero && webglOk()) {
+/**
+ * Lägger en havsyta i elementet `hero`.
+ * farger: { djup, spridning, zenit, horisont, sol } (hex), saknade värden tar standard.
+ * lasText: läs av rubrikens (selektorn `rubrik`) placering i elementet och mörkna där.
+ * Returnerar { setFarger } – eller null om WebGL saknas.
+ */
+export function skapaHav(hero, { farger = {}, lasText = true, rubrik = 'h1', fordrojning = 900 } = {}) {
+	if (!hero || !webglOk()) {
+		return null;
+	}
 	hero.classList.add('hjd-hero');
 
 	const canvas = document.createElement('canvas');
@@ -36,13 +55,25 @@ if (hero && webglOk()) {
 		uTime: { value: 0 },
 		uRes: { value: new THREE.Vector2(1, 1) },
 		uBox: { value: new THREE.Vector4(0.0, 0.1, 0.5, 0.75) },
-		uZenit: { value: col('#1466D2') },
-		uHorisont: { value: col('#7FC2F0') },
-		uDjup: { value: col('#002A5E') },
-		uSpridning: { value: col('#0A8BD8') },
+		uZenit: { value: col(STANDARD.zenit) },
+		uHorisont: { value: col(STANDARD.horisont) },
+		uDjup: { value: col(STANDARD.djup) },
+		uSpridning: { value: col(STANDARD.spridning) },
 		uMaxVagor: { value: 22 },
-		uSol: { value: col('#FFF4DC') },
+		uSol: { value: col(STANDARD.sol) },
 	};
+
+	function setFarger(nya) {
+		Object.keys(UNIFORM).forEach((k) => {
+			const v = nya && nya[k];
+			if (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v)) {
+				uniforms[UNIFORM[k]].value.set(v);
+			}
+		});
+		if (reduce) {
+			renderer.render(scene, camera);
+		}
+	}
 
 	const material = new THREE.ShaderMaterial({
 		uniforms,
@@ -155,7 +186,10 @@ if (hero && webglOk()) {
 				ut.y *= uRes.y / uRes.x;
 				float iText = 1.0 - smoothstep(0.0, 0.22, length(ut));
 				float skugga = iText * 0.52 + smoothstep(0.4, 0.0, uv.y) * 0.38 + smoothstep(0.78, 1.0, uv.y) * 0.5;
-				c = mix(c, c * vec3(0.38, 0.55, 0.82), clamp(skugga, 0.0, 0.78));
+				// Skuggan tonas i vattnets egen färg (blått vatten ger blå skugga).
+				vec3 ton = uDjup / max(max(uDjup.r, uDjup.g), max(uDjup.b, 0.001));
+				vec3 skuggfarg = clamp(0.38 + 0.5 * ton, 0.0, 1.0);
+				c = mix(c, c * skuggfarg, clamp(skugga, 0.0, 0.78));
 
 				// Klarare blått: lyft mättnaden något.
 				float lum = dot(c, vec3(0.2126, 0.7152, 0.0722));
@@ -168,11 +202,12 @@ if (hero && webglOk()) {
 	});
 
 	scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+	setFarger(farger);
 
 	// Läs av var rubrik, ingress och knappar står, så att havet mörknar där.
 	function textBox() {
-		const h1 = hero.querySelector('h1');
-		if (!h1 || !h1.parentElement) {
+		const h1 = hero.querySelector(rubrik);
+		if (!lasText || !h1 || !h1.parentElement) {
 			return;
 		}
 		const hr = hero.getBoundingClientRect();
@@ -261,6 +296,14 @@ if (hero && webglOk()) {
 		setTimeout(() => {
 			clock.getDelta();
 			renderer.setAnimationLoop(frame);
-		}, 900);
+		}, fordrojning);
 	}
+
+	return { setFarger };
+}
+
+// Startsidan: havet i heron, med färgerna från inställningarna.
+const cfg = window.HJD_HAV || {};
+if (cfg.auto) {
+	skapaHav(document.querySelector('.elementor header:has(h1)'), { farger: cfg.farger || {} });
 }

@@ -1,0 +1,127 @@
+/* Utseende → Havsyta */
+.hjd-hav-ingress {
+	max-width: 720px;
+	font-size: 14px;
+}
+
+.hjd-hav-layout {
+	display: grid;
+	grid-template-columns: minmax(320px, 520px) minmax(320px, 1fr);
+	gap: 32px;
+	align-items: start;
+	margin-top: 16px;
+}
+
+@media (max-width: 1100px) {
+	.hjd-hav-layout {
+		grid-template-columns: 1fr;
+	}
+	.hjd-hav-forhand {
+		order: -1;
+	}
+}
+
+.hjd-hav-form h2 {
+	margin-top: 8px;
+}
+
+.hjd-hav-form .form-table th {
+	width: 170px;
+}
+
+.hjd-hav-forval {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 24px;
+}
+
+.hjd-hav-forval-knapp {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 12px 6px 6px;
+	border: 1px solid #c3c4c7;
+	border-radius: 999px;
+	background: #fff;
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.hjd-hav-forval-knapp:hover,
+.hjd-hav-forval-knapp:focus-visible {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+	outline: none;
+}
+
+.hjd-hav-prov {
+	display: inline-flex;
+	overflow: hidden;
+	border-radius: 999px;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.hjd-hav-prov span {
+	display: block;
+	width: 12px;
+	height: 22px;
+}
+
+.hjd-hav-aterstall {
+	margin-left: 8px !important;
+}
+
+.hjd-hav-forhand {
+	position: sticky;
+	top: 48px;
+}
+
+.hjd-hav-scen {
+	position: relative;
+	display: flex;
+	align-items: flex-end;
+	aspect-ratio: 16 / 10;
+	border-radius: 22px;
+	overflow: hidden;
+	background-color: #002a5e;
+}
+
+.hjd-hav-scen-text {
+	position: relative;
+	z-index: 1;
+	padding: 0 8% 9%;
+	color: #fff;
+}
+
+.hjd-hav-scen-text h2 {
+	max-width: 9ch;
+	margin: 0 0 12px;
+	color: #fff;
+	font-size: clamp(28px, 4vw, 54px);
+	font-weight: 600;
+	line-height: 0.98;
+	letter-spacing: -0.03em;
+}
+
+.hjd-hav-scen-text p {
+	margin: 0;
+	color: rgba(255, 255, 255, 0.85);
+	font-size: 14px;
+}
+
+/* Kanvasen från hav.js (design.css laddas inte i admin). */
+.hjd-hav-scen .hjd-hav {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	display: block;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	transition: opacity 0.8s ease;
+}
+
+.hjd-hav-scen .hjd-hav.is-ready {
+	opacity: 1;
+}
