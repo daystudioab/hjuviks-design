@@ -20,8 +20,21 @@ function reservToning() {
 	scen.style.backgroundImage = `linear-gradient(180deg, ${f.spridning} 0%, ${f.djup} 100%)`;
 }
 
+// Markera färgskalan som stämmer med de valda färgerna, om någon gör det.
+function markeraForval() {
+	const f = nuvarande();
+	const nycklar = ['djup', 'spridning', 'zenit', 'horisont', 'sol'];
+	document.querySelectorAll('.hjd-hav-forval-knapp').forEach((knapp) => {
+		const skala = (cfg.forval || {})[knapp.dataset.forval] || [];
+		const lika = nycklar.every((k, i) => (skala[i] || '').toLowerCase() === (f[k] || '').toLowerCase());
+		knapp.classList.toggle('is-vald', lika);
+		knapp.setAttribute('aria-pressed', lika ? 'true' : 'false');
+	});
+}
+
 function uppdatera() {
 	reservToning();
+	markeraForval();
 	if (hav) {
 		hav.setFarger(nuvarande());
 	}
@@ -70,6 +83,7 @@ if (aterstall) {
 }
 
 reservToning();
+markeraForval();
 
 // Samma havsyta som på startsidan.
 import(`./hav.js?ver=${encodeURIComponent(cfg.version || '')}`)

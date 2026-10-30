@@ -23,16 +23,44 @@ function hjd_hav_falt() {
 }
 
 /**
- * Färdiga färgskalor att utgå från.
+ * Färdiga färgskalor att utgå från, grupperade efter tid på dygnet.
+ * Ordning i varje skala: djup, spridning, zenit, horisont, sol.
+ */
+function hjd_hav_forval_grupper() {
+	return array(
+		'Dag' => array(
+			'Klarblå sommar' => array( '#002A5E', '#0A8BD8', '#1466D2', '#7FC2F0', '#FFF4DC' ),
+			'Turkos lagun' => array( '#00404A', '#0FB5B0', '#1C8FC9', '#9FE3E6', '#FFF6E0' ),
+		),
+		'Morgon' => array(
+			'Morgongry' => array( '#1C2440', '#6E7FB8', '#8C8FC4', '#F4B9B2', '#FFE3D1' ),
+			'Soluppgång' => array( '#1B2540', '#5B86B4', '#7A8EC4', '#FFB98A', '#FFD49A' ),
+			'Morgondis' => array( '#2A3B4D', '#7FA3B8', '#A4B9CC', '#E6E1DA', '#FFF7EC' ),
+			'Blank morgon' => array( '#0D3557', '#3E9AD0', '#6FAEE0', '#D7EAF5', '#FFFBEF' ),
+			'Vårmorgon' => array( '#0F2F38', '#3F8E93', '#5B8FA8', '#C9E2DC', '#F5FBF2' ),
+			'Persikogryning' => array( '#2B2440', '#B07C8A', '#8F86BE', '#FFC7A1', '#FFE2C4' ),
+		),
+		'Kväll' => array(
+			'Gyllene timmen' => array( '#1F2236', '#8A6A5A', '#5A6A9E', '#F6B565', '#FFD27A' ),
+			'Solnedgång' => array( '#1E1530', '#6A3F78', '#5A3E86', '#F07F5A', '#FFB36B' ),
+			'Kvällssol' => array( '#0E1F45', '#2F6FB5', '#3A4F9A', '#F2B48A', '#FFD9A8' ),
+			'Skymning' => array( '#14122E', '#4B3F8C', '#3A2F73', '#B48BC8', '#F2D4F0' ),
+			'Blå timmen' => array( '#071433', '#1F4F9A', '#1B2F6E', '#6E8BD0', '#DCE6FF' ),
+			'Midsommarnatt' => array( '#18243F', '#4D6EA6', '#4A5A92', '#E8B9C4', '#FFF0E6' ),
+			'Månsken' => array( '#050B1C', '#1B3358', '#142446', '#4C6A92', '#E8EEF8' ),
+		),
+	);
+}
+
+/**
+ * Alla färdiga färgskalor i en platt lista (namn => färger).
  */
 function hjd_hav_forval() {
-	return array(
-		'Klarblå sommar' => array( '#002A5E', '#0A8BD8', '#1466D2', '#7FC2F0', '#FFF4DC' ),
-		'Turkos lagun'   => array( '#00404A', '#0FB5B0', '#1C8FC9', '#9FE3E6', '#FFF6E0' ),
-		'Djupt hav'      => array( '#001833', '#0B5FA8', '#123E8C', '#5E93C9', '#E8F0FF' ),
-		'Västkust grå'   => array( '#13242F', '#4A7A93', '#4E6E86', '#B9CAD4', '#F4F1EA' ),
-		'Kvällssol'      => array( '#0E1F45', '#2F6FB5', '#3A4F9A', '#F2B48A', '#FFD9A8' ),
-	);
+	$ut = array();
+	foreach ( hjd_hav_forval_grupper() as $skalor ) {
+		$ut = array_merge( $ut, $skalor );
+	}
+	return $ut;
 }
 
 /**
@@ -117,18 +145,21 @@ function hjd_hav_sida() {
 				<?php settings_fields( 'hjd_hav' ); ?>
 
 				<h2>Färdiga färgskalor</h2>
-				<div class="hjd-hav-forval">
-					<?php foreach ( hjd_hav_forval() as $namn => $skala ) : ?>
-						<button type="button" class="hjd-hav-forval-knapp" data-forval="<?php echo esc_attr( $namn ); ?>">
-							<span class="hjd-hav-prov">
-								<?php foreach ( $skala as $hex ) : ?>
-									<span style="background:<?php echo esc_attr( $hex ); ?>"></span>
-								<?php endforeach; ?>
-							</span>
-							<?php echo esc_html( $namn ); ?>
-						</button>
-					<?php endforeach; ?>
-				</div>
+				<?php foreach ( hjd_hav_forval_grupper() as $grupp => $skalor ) : ?>
+					<h3 class="hjd-hav-grupp"><?php echo esc_html( $grupp ); ?></h3>
+					<div class="hjd-hav-forval">
+						<?php foreach ( $skalor as $namn => $skala ) : ?>
+							<button type="button" class="hjd-hav-forval-knapp" data-forval="<?php echo esc_attr( $namn ); ?>">
+								<span class="hjd-hav-prov">
+									<?php foreach ( $skala as $hex ) : ?>
+										<span style="background:<?php echo esc_attr( $hex ); ?>"></span>
+									<?php endforeach; ?>
+								</span>
+								<?php echo esc_html( $namn ); ?>
+							</button>
+						<?php endforeach; ?>
+					</div>
+				<?php endforeach; ?>
 
 				<h2>Egna färger</h2>
 				<table class="form-table" role="presentation">

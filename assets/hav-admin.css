@@ -29,11 +29,29 @@
 	width: 170px;
 }
 
+.hjd-hav-grupp {
+	margin: 16px 0 8px;
+	color: #50575e;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
 .hjd-hav-forval {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
-	margin-bottom: 24px;
+	margin-bottom: 8px;
+}
+
+.hjd-hav-forval + h2 {
+	margin-top: 24px;
+}
+
+.hjd-hav-forval .hjd-hav-forval-knapp.is-vald {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
 }
 
 .hjd-hav-forval-knapp {
