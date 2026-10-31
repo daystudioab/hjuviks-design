@@ -96,6 +96,9 @@
 
 			// 3. Bilder öppnar sig
 			var bilder = document.querySelectorAll('.elementor section img.e-image-base:not([src*="hjuviks-karta"])');
+			bilder = Array.prototype.filter.call(bilder, function (img) {
+				return !img.closest('.hm-panorera');
+			});
 			Array.prototype.forEach.call(bilder, function (img) {
 				gsap.fromTo(img, { clipPath: 'inset(14% 8% 14% 8%)', scale: 1.08 }, {
 					clipPath: 'inset(0% 0% 0% 0%)',
@@ -108,6 +111,52 @@
 						once: true,
 					},
 				});
+			});
+		});
+
+		// 4. Panorering: en bild i en .hm-panorera-ruta glider långsamt så att rutan visar
+		//    bilden från höger kant till vänster kant (15 s), och tillbaka. Bilden är förankrad
+		//    till höger i CSS, så utan JS eller med minska rörelse visas startbilden.
+		mm.add('(prefers-reduced-motion: no-preference)', function () {
+			Array.prototype.forEach.call(document.querySelectorAll('.hm-panorera'), function (ruta) {
+				var img = ruta.querySelector('img');
+				if (!img) {
+					return;
+				}
+				var avstand = function () {
+					return Math.max(0, img.getBoundingClientRect().width - ruta.getBoundingClientRect().width);
+				};
+				var tween = gsap.fromTo(img, { x: 0 }, {
+					x: avstand,
+					duration: 15,
+					ease: 'sine.inOut',
+					repeat: -1,
+					yoyo: true,
+					paused: true,
+				});
+				ScrollTrigger.create({
+					trigger: ruta,
+					start: 'top bottom',
+					end: 'bottom top',
+					// Rulla bara när rutan syns.
+					onToggle: function (self) {
+						if (self.isActive) {
+							tween.play();
+						} else {
+							tween.pause();
+						}
+					},
+					// Ny bredd (ändrad skärmstorlek, bilden laddad): räkna om sträckan.
+					onRefresh: function () {
+						var p = tween.totalProgress();
+						tween.invalidate().totalProgress(p);
+					},
+				});
+				if (!img.complete) {
+					img.addEventListener('load', function () {
+						ScrollTrigger.refresh();
+					}, { once: true });
+				}
 			});
 		});
 
