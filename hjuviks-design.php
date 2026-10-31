@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Hjuviks Marina – Design och rörelse
- * Description: Havsyta i startsidans hero (Three.js) med valbara färger under Utseende → Havsyta, rörelser för rubriker, citat och bilder (GSAP). Respekterar "minska rörelse" i besökarens inställningar.
- * Version: 1.6.2
+ * Description: Havsyta i startsidans hero (Three.js) med valbara färger under Utseende → Havsyta, rörelser för rubriker, citat och bilder (GSAP) samt ankarlänkar för one-page. Respekterar "minska rörelse" i besökarens inställningar.
+ * Version: 1.7.0
  * Update URI: https://github.com/daystudioab/hjuviks-design
  * Author: Studio Day
  * Requires at least: 6.0
@@ -31,7 +31,7 @@ if ( defined( 'STUDIODAY_GITHUB_TOKEN' ) && STUDIODAY_GITHUB_TOKEN ) {
 	$hjd_uppdaterare->setAuthentication( STUDIODAY_GITHUB_TOKEN );
 }
 
-define( 'HJD_VERSION', '1.6.2' );
+define( 'HJD_VERSION', '1.7.0' );
 define( 'HJD_URL', plugin_dir_url( __FILE__ ) );
 
 require_once __DIR__ . '/includes/havsyta-farger.php';
@@ -67,6 +67,7 @@ add_action( 'wp_enqueue_scripts', function () {
 
 	wp_enqueue_style( 'hjd-design', HJD_URL . 'assets/design.css', array(), HJD_VERSION );
 
+	wp_enqueue_script( 'hjd-ankare', HJD_URL . 'assets/ankare.js', array(), HJD_VERSION, true );
 	wp_enqueue_script( 'hjd-gsap', HJD_URL . 'assets/vendor/gsap.min.js', array(), '3.15.0', true );
 	wp_enqueue_script( 'hjd-scrolltrigger', HJD_URL . 'assets/vendor/ScrollTrigger.min.js', array( 'hjd-gsap' ), '3.15.0', true );
 	wp_enqueue_script( 'hjd-splittext', HJD_URL . 'assets/vendor/SplitText.min.js', array( 'hjd-gsap' ), '3.15.0', true );

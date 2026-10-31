@@ -58,3 +58,10 @@
 	will-change: opacity;
 }
 
+
+/* One-page: mjuk scroll till ankarlänkar (hm-ankare-*). */
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
