@@ -18,14 +18,18 @@
 		var id = decodeURIComponent((location.hash || '').slice(1));
 		var el = id ? document.getElementById(id) : null;
 		if (el) {
-			el.scrollIntoView({ behavior: 'auto', block: 'start' });
+			el.scrollIntoView({ behavior: 'instant', block: 'start' });
 		}
+	}
+	// Vänta tills rörelserna (ScrollTrigger) har räknat om sidan vid load, annars hamnar man fel.
+	function senare() {
+		setTimeout(tillHash, 150);
 	}
 	if (location.hash) {
 		if (document.readyState === 'complete') {
-			tillHash();
+			senare();
 		} else {
-			window.addEventListener('load', tillHash);
+			window.addEventListener('load', senare);
 		}
 	}
 })();
