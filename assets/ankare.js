@@ -21,6 +21,24 @@
 			el.scrollIntoView({ behavior: 'instant', block: 'start' });
 		}
 	}
+	// Kartan (animerad SVG) spelar sin animation när den laddas. Starta om den när den syns första gången.
+	var kartor = document.querySelectorAll('img[src*="hjuviks-karta"]');
+	if (kartor.length && 'IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		var obs = new IntersectionObserver(function (poster) {
+			poster.forEach(function (p) {
+				if (p.isIntersecting) {
+					obs.unobserve(p.target);
+					var src = p.target.getAttribute('src').replace(/([?&])spela=\d+/, '');
+					p.target.removeAttribute('srcset');
+					p.target.setAttribute('src', src + (src.indexOf('?') > -1 ? '&' : '?') + 'spela=' + Date.now());
+				}
+			});
+		}, { threshold: 0.35 });
+		Array.prototype.forEach.call(kartor, function (img) {
+			obs.observe(img);
+		});
+	}
+
 	// Vänta tills rörelserna (ScrollTrigger) har räknat om sidan vid load, annars hamnar man fel.
 	function senare() {
 		setTimeout(tillHash, 150);

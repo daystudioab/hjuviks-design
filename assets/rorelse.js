@@ -95,7 +95,7 @@
 			}
 
 			// 3. Bilder öppnar sig
-			var bilder = document.querySelectorAll('.elementor section img.e-image-base');
+			var bilder = document.querySelectorAll('.elementor section img.e-image-base:not([src*="hjuviks-karta"])');
 			Array.prototype.forEach.call(bilder, function (img) {
 				gsap.fromTo(img, { clipPath: 'inset(14% 8% 14% 8%)', scale: 1.08 }, {
 					clipPath: 'inset(0% 0% 0% 0%)',
