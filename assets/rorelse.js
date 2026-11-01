@@ -4,7 +4,7 @@
  * 2. Citatet: orden får full färg i läsfart medan man scrollar.
  * 3. Bilder: öppnar sig när de kommer in i bild.
  * 4. Panorering i .hm-panorera-rutor.
- * 5. Textfyllnad: text med klassen hm-fyll är ljusgrå och fylls i ord för ord i scrollfart,
+ * 5. Textfyllnad: text med klassen hm-fyll är ljusgrå och fylls i bokstav för bokstav i scrollfart,
  *    stycken i samma block som en enda löpande text.
  * 6. Paus: block med klassen hm-paus tonas in i scrollfart och stannar sedan en kort stund i
  *    fönstrets mitt medan sidan scrollar.
@@ -172,8 +172,10 @@
 			});
 		});
 
-		// 5. Textfyllnad: orden i .hm-fyll-element börjar ljusgrå och får textens egen färg
-		//    i takt med att besökaren scrollar (scrub, ingen tidsstyrning). Stycken som ligger
+		// 5. Textfyllnad: bokstäverna i .hm-fyll-element börjar ljusgrå och får textens egen färg
+		//    i takt med att besökaren scrollar (scrub, ingen tidsstyrning). Varje bokstav tonar
+		//    över en kort sträcka, så att fronten blir mjuk i stället för hackig. Orden hålls ihop
+		//    så att radbrytningarna inte ändras. Stycken som ligger
 		//    i samma block fylls som en enda löpande text, från första till sista ordet.
 		//    Utan JS eller med minska rörelse visas texten i sin vanliga färg.
 		mm.add('(prefers-reduced-motion: no-preference)', function () {
@@ -191,15 +193,17 @@
 			grupper.forEach(function (grupp) {
 				var els = grupp.element;
 				SplitText.create(els, {
-					type: 'words',
+					type: 'words,chars',
 					wordsClass: 'hjd-fyll-ord',
+					charsClass: 'hjd-fyll-tecken',
 					onSplit: function (self) {
-						return gsap.fromTo(self.words, { color: fran }, {
-							color: function (i, ord) {
-								return ord.closest('.hm-fyll').getAttribute('data-hjd-farg');
+						return gsap.fromTo(self.chars, { color: fran }, {
+							color: function (i, tecken) {
+								return tecken.closest('.hm-fyll').getAttribute('data-hjd-farg');
 							},
+							duration: 0.5,
 							ease: 'none',
-							stagger: 0.1,
+							stagger: 0.02,
 							scrollTrigger: {
 								trigger: els[0],
 								endTrigger: els[els.length - 1],
