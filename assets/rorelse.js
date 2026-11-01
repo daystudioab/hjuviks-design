@@ -3,6 +3,8 @@
  * 1. Heron: rubriken reser sig rad för rad när sidan öppnas.
  * 2. Citatet: orden får full färg i läsfart medan man scrollar.
  * 3. Bilder: öppnar sig när de kommer in i bild.
+ * 4. Panorering i .hm-panorera-rutor.
+ * 5. Textfyllnad: text med klassen hm-fyll är ljusgrå och fylls i ord för ord i scrollfart.
  * Allt stängs av vid "minska rörelse". */
 (function () {
 	'use strict';
@@ -159,6 +161,33 @@
 						ScrollTrigger.refresh();
 					}, { once: true });
 				}
+			});
+		});
+
+		// 5. Textfyllnad: varje ord i ett .hm-fyll-element börjar ljusgrått och får textens
+		//    egen färg i takt med att besökaren scrollar (scrub, ingen tidsstyrning).
+		//    Utan JS eller med minska rörelse visas texten i sin vanliga färg.
+		mm.add('(prefers-reduced-motion: no-preference)', function () {
+			var fran = '#d3d6db';
+			gsap.utils.toArray('.hm-fyll').forEach(function (el) {
+				var slut = window.getComputedStyle(el).color;
+				SplitText.create(el, {
+					type: 'words',
+					wordsClass: 'hjd-fyll-ord',
+					onSplit: function (self) {
+						return gsap.fromTo(self.words, { color: fran }, {
+							color: slut,
+							ease: 'none',
+							stagger: 0.1,
+							scrollTrigger: {
+								trigger: el,
+								start: 'top 82%',
+								end: 'bottom 48%',
+								scrub: 0.6,
+							},
+						});
+					},
+				});
 			});
 		});
 
