@@ -33,24 +33,13 @@
 	margin-bottom: -0.1em;
 }
 
-/* Herointrot: heron är stängd i mitten och innehållet osynligt tills rorelse.js sveper upp
-   den (klassen hjd-intro-start tar över med inline-stilar). Om något fallerar öppnas allt
-   ändå efter 4 s. */
+/* Herointrot: innehållet i heron (logga, rubrik, ingress, knappar) är osynligt tills
+   rorelse.js tonar in det (klassen hjd-intro-start tar över med inline-stilar). Om något
+   fallerar visas det ändå efter 4 s. */
 @media (prefers-reduced-motion: no-preference) {
-	html.hjd-js .elementor header:has(h1):not(.hjd-intro-start) {
-		clip-path: inset(0% 50% 0% 50%);
-		animation: hjd-oppna 0s linear 4s forwards;
-	}
-
 	html.hjd-js .elementor header:has(h1):not(.hjd-intro-start) > *:not(.hjd-hav) {
 		opacity: 0;
 		animation: hjd-visa 0s linear 4s forwards;
-	}
-}
-
-@keyframes hjd-oppna {
-	to {
-		clip-path: none;
 	}
 }
 

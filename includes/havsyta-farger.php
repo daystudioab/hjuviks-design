@@ -206,7 +206,8 @@ function hjd_hav_sida() {
 }
 
 /**
- * Reservtoning i heron (utan WebGL) när färgerna har ändrats från standard.
+ * Bakgrund i heron när färgerna har ändrats från standard: havets grundfärg medan havsytan
+ * laddar (ingen toning som blinkar fram), och färgtoningen bara utan WebGL.
  */
 add_action( 'wp_head', function () {
 	if ( ! function_exists( 'hjd_is_frontend' ) || ! hjd_is_frontend() || ! is_front_page() || ! hjd_hav_ar_andrat() ) {
@@ -214,7 +215,7 @@ add_action( 'wp_head', function () {
 	}
 	$f = hjd_hav_farger();
 	printf(
-		"<style id=\"hjd-hav-reserv\">.elementor header:has(h1){background-color:%1\$s !important;background-image:linear-gradient(180deg,%2\$s 0%%,%1\$s 100%%) !important;}</style>\n",
+		"<style id=\"hjd-hav-reserv\">.elementor header:has(h1){background-color:%1\$s !important;background-image:none !important;}html:not(.hjd-webgl) .elementor header:has(h1){background-image:linear-gradient(180deg,%2\$s 0%%,%1\$s 100%%) !important;}</style>\n",
 		esc_attr( $f['djup'] ),
 		esc_attr( $f['spridning'] )
 	);

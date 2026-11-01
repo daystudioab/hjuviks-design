@@ -1,6 +1,6 @@
 /* Hjuviks Marina – rörelser (GSAP).
  * Tre motiverade moment:
- * 1. Heron: sveps upp från mitten och ut när havsytan är redo, sedan tonas text och logga in.
+ * 1. Heron: text och logga tonas in när havsytan är redo.
  * 2. Citatet: orden får full färg i läsfart medan man scrollar.
  * 3. Bilder: öppnar sig när de kommer in i bild.
  * 4. Panorering i .hm-panorera-rutor.
@@ -10,6 +10,7 @@
  *    fönstrets mitt medan sidan scrollar.
  * 7. Zoom: block med klassen hm-zoom börjar något större och lite lutat och zoomas på plats
  *    (0 grader) i scrollfart.
+ * Bilder i block med klassen hm-stilla rör sig inte alls (ingen öppning med clip-path).
  * Allt stängs av vid "minska rörelse". */
 (function () {
 	'use strict';
@@ -46,38 +47,29 @@
 		var mm = gsap.matchMedia();
 
 		mm.add('(prefers-reduced-motion: no-preference)', function () {
-			// 1. Hero: vänta tills havsytan har ritat sin första bild (eller högst 1,5 s), svep
-			//    sedan upp heron från mitten och ut med clip-path, och tona därefter in allt
-			//    innehåll (logga, rubrik, ingress, knappar). CSS håller heron stängd tills dess.
+			// 1. Hero: vänta tills havsytan har ritat sin första bild (eller högst 1,5 s) och tona
+			//    sedan in allt innehåll (logga, rubrik, ingress, knappar). Heron själv syns direkt
+			//    med havets grundfärg. CSS håller innehållet osynligt tills dess.
 			if (hero) {
 				var innehall = Array.prototype.filter.call(hero.children, function (el) {
 					return !el.classList.contains('hjd-hav');
 				});
-				var radie = window.getComputedStyle(hero).borderTopLeftRadius || '0px';
-				var stangd = 'inset(0% 50% 0% 50% round ' + radie + ')';
-				var oppen = 'inset(0% 0% 0% 0% round ' + radie + ')';
 
 				// Elementors behållare har en CSS-övergång som annars släpar efter GSAP.
 				innehall.forEach(function (el) {
 					el.style.transition = 'none';
 				});
-				gsap.set(hero, { clipPath: stangd });
 				gsap.set(innehall, { autoAlpha: 0 });
 				hero.classList.add('hjd-intro-start');
 
-				var intro = gsap.timeline({ paused: true });
-				// fromTo med båda värdena utskrivna: webbläsaren förkortar annars startvärdet
-				// (inset(0% 50%)) och GSAP parar då ihop fel siffror, så svepet går från vänster.
-				intro
-					.fromTo(hero, { clipPath: stangd }, { clipPath: oppen, duration: 1.4, ease: 'expo.inOut', immediateRender: false })
-					.set(hero, { clearProps: 'clipPath' })
-					.to(innehall, {
-						autoAlpha: 1,
-						duration: 1,
-						ease: 'power2.out',
-						stagger: 0.08,
-						clearProps: 'opacity,visibility,transition',
-					}, '>-0.1');
+				var intro = gsap.to(innehall, {
+					autoAlpha: 1,
+					duration: 1.1,
+					ease: 'power2.out',
+					stagger: 0.08,
+					paused: true,
+					clearProps: 'opacity,visibility,transition',
+				});
 
 				var startat = false;
 				var starta = function () {
@@ -115,7 +107,7 @@
 			// 3. Bilder öppnar sig
 			var bilder = document.querySelectorAll('.elementor section img.e-image-base:not([src*="hjuviks-karta"])');
 			bilder = Array.prototype.filter.call(bilder, function (img) {
-				return !img.closest('.hm-panorera, .hm-zoom');
+				return !img.closest('.hm-panorera, .hm-zoom, .hm-stilla');
 			});
 			Array.prototype.forEach.call(bilder, function (img) {
 				gsap.fromTo(img, { clipPath: 'inset(14% 8% 14% 8%)', scale: 1.08 }, {
