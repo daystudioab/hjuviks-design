@@ -253,7 +253,9 @@
 						end: function () {
 							return 'top bottom-=' + treRader();
 						},
-						scrub: 0.25,
+						// Följer scrollen exakt (ingen eftersläpning), så att texten är helt
+						// tydlig just när den tredje raden kommer in.
+						scrub: true,
 						invalidateOnRefresh: true,
 					},
 				});
