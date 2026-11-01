@@ -6,7 +6,8 @@
  * 4. Panorering i .hm-panorera-rutor.
  * 5. Textfyllnad: text med klassen hm-fyll är ljusgrå och fylls i ord för ord i scrollfart,
  *    stycken i samma block som en enda löpande text.
- * 6. 3D-entré: block med klassen hm-3d lutar bakåt och faller på plats i scrollfart.
+ * 6. Paus: block med klassen hm-paus stannar en kort stund i fönstrets mitt medan sidan scrollar.
+ * 7. Zoom: block med klassen hm-zoom börjar något större och zoomas på plats i scrollfart.
  * Allt stängs av vid "minska rörelse". */
 (function () {
 	'use strict';
@@ -101,7 +102,7 @@
 			// 3. Bilder öppnar sig
 			var bilder = document.querySelectorAll('.elementor section img.e-image-base:not([src*="hjuviks-karta"])');
 			bilder = Array.prototype.filter.call(bilder, function (img) {
-				return !img.closest('.hm-panorera, .hm-3d');
+				return !img.closest('.hm-panorera, .hm-zoom');
 			});
 			Array.prototype.forEach.call(bilder, function (img) {
 				gsap.fromTo(img, { clipPath: 'inset(14% 8% 14% 8%)', scale: 1.08 }, {
@@ -207,30 +208,50 @@
 			});
 		});
 
-		// 6. 3D-entré: ett .hm-3d-block (t.ex. en bild med rundade hörn) ligger lutat bakåt,
-		//    lite nedsänkt och mindre, och fäller upp sig på plats i takt med scrollen.
+		// 6. Paus: ett .hm-paus-block fäster i fönstrets mitt en kort stund (45 % av fönstrets
+		//    höjd i scrollsträcka) medan sidan runt omkring fortsätter. Fästet räknas om först
+		//    (refreshPriority), så att utlösare längre ned tar hänsyn till det extra utrymmet.
+		// 7. Zoom: ett .hm-zoom-block börjar något större (högst 20 %, aldrig bredare än
+		//    fönstret) och zoomas ned till sin plats i takt med scrollen.
 		//    Elementors behållare har en övergång på transform som skulle släpa efter scrollen,
-		//    så den stängs av. Utan JS eller med minska rörelse står blocket bara på plats.
+		//    så den stängs av. Utan JS eller med minska rörelse står allt bara på plats.
 		mm.add('(prefers-reduced-motion: no-preference)', function () {
-			gsap.utils.toArray('.hm-3d').forEach(function (el) {
+			gsap.utils.toArray('.hm-paus').forEach(function (el) {
 				el.style.transition = 'none';
+				ScrollTrigger.create({
+					trigger: el,
+					start: 'center center',
+					end: function () {
+						return '+=' + Math.round(window.innerHeight * 0.45);
+					},
+					pin: true,
+					pinSpacing: true,
+					anticipatePin: 1,
+					refreshPriority: 1,
+					invalidateOnRefresh: true,
+				});
+			});
+
+			gsap.utils.toArray('.hm-zoom').forEach(function (el) {
+				el.style.transition = 'none';
+				var startskala = function () {
+					var bredd = el.offsetWidth || 1;
+					var ledigt = window.innerWidth / bredd;
+					return Math.max(1, Math.min(1.2, ledigt));
+				};
 				gsap.fromTo(el, {
-					rotationX: 24,
-					y: 90,
-					scale: 0.92,
-					transformPerspective: 1400,
-					transformOrigin: '50% 100%',
+					scale: startskala,
+					transformOrigin: '50% 50%',
 				}, {
-					rotationX: 0,
-					y: 0,
 					scale: 1,
 					ease: 'power2.out',
 					force3D: true,
 					scrollTrigger: {
 						trigger: el,
-						start: 'top 98%',
-						end: 'top 35%',
-						scrub: 1.2,
+						start: 'top bottom',
+						end: 'center 55%',
+						scrub: 1,
+						invalidateOnRefresh: true,
 					},
 				});
 			});
