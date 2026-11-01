@@ -6,6 +6,7 @@
  * 4. Panorering i .hm-panorera-rutor.
  * 5. Textfyllnad: text med klassen hm-fyll är ljusgrå och fylls i ord för ord i scrollfart,
  *    stycken i samma block som en enda löpande text.
+ * 6. 3D-entré: block med klassen hm-3d lutar bakåt och faller på plats i scrollfart.
  * Allt stängs av vid "minska rörelse". */
 (function () {
 	'use strict';
@@ -100,7 +101,7 @@
 			// 3. Bilder öppnar sig
 			var bilder = document.querySelectorAll('.elementor section img.e-image-base:not([src*="hjuviks-karta"])');
 			bilder = Array.prototype.filter.call(bilder, function (img) {
-				return !img.closest('.hm-panorera');
+				return !img.closest('.hm-panorera, .hm-3d');
 			});
 			Array.prototype.forEach.call(bilder, function (img) {
 				gsap.fromTo(img, { clipPath: 'inset(14% 8% 14% 8%)', scale: 1.08 }, {
@@ -201,6 +202,35 @@
 								scrub: 0.6,
 							},
 						});
+					},
+				});
+			});
+		});
+
+		// 6. 3D-entré: ett .hm-3d-block (t.ex. en bild med rundade hörn) ligger lutat bakåt,
+		//    lite nedsänkt och mindre, och fäller upp sig på plats i takt med scrollen.
+		//    Elementors behållare har en övergång på transform som skulle släpa efter scrollen,
+		//    så den stängs av. Utan JS eller med minska rörelse står blocket bara på plats.
+		mm.add('(prefers-reduced-motion: no-preference)', function () {
+			gsap.utils.toArray('.hm-3d').forEach(function (el) {
+				el.style.transition = 'none';
+				gsap.fromTo(el, {
+					rotationX: 24,
+					y: 90,
+					scale: 0.92,
+					transformPerspective: 1400,
+					transformOrigin: '50% 100%',
+				}, {
+					rotationX: 0,
+					y: 0,
+					scale: 1,
+					ease: 'power2.out',
+					force3D: true,
+					scrollTrigger: {
+						trigger: el,
+						start: 'top 98%',
+						end: 'top 35%',
+						scrub: 1.2,
 					},
 				});
 			});
