@@ -66,8 +66,12 @@
 }
 
 
-/* One-page: mjuk scroll till ankarlänkar sköts av ankare.js (inte CSS scroll-behavior,
-   som stör ScrollTriggers mätningar och fästet i om-sektionen). */
+/* One-page: mjuk scroll till ankarlänkar sköts av ankare.js. Elementor slår på
+   html { scroll-behavior: smooth } för hela sidan, vilket stör ScrollTriggers mätningar
+   och fästet i om-sektionen, så den stängs av när skripten körs (hjd-js). */
+html.hjd-js {
+	scroll-behavior: auto;
+}
 
 /* Glöd bakom en knapp (global klass hm-glod): ett suddigt sken i knappens egen
  * färg som andas långsamt. Bara opacity och transform animeras, så det är billigt.
