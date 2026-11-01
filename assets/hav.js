@@ -283,14 +283,22 @@ export function skapaHav(hero, { farger = {}, lasText = true, rubrik = 'h1', for
 			renderer.render(scene, camera);
 			if (!started) {
 				started = true;
-				canvas.classList.add('is-ready');
+				klar();
 			}
 		}
 	}
 
+	// Första bilden är ritad: visa kanvasen och berätta det för rörelserna (herointrot väntar
+	// på det, så att havet syns direkt när heron sveps fram, utan färgtoning först).
+	function klar() {
+		canvas.classList.add('is-ready');
+		hero.setAttribute('data-hav-redo', '');
+		hero.dispatchEvent(new CustomEvent('hjd:hav-redo', { bubbles: true }));
+	}
+
 	if (reduce) {
 		renderer.render(scene, camera);
-		canvas.classList.add('is-ready');
+		klar();
 	} else {
 		// Låt rubrikintrot få processorn först.
 		setTimeout(() => {
@@ -305,5 +313,6 @@ export function skapaHav(hero, { farger = {}, lasText = true, rubrik = 'h1', for
 // Startsidan: havet i heron, med färgerna från inställningarna.
 const cfg = window.HJD_HAV || {};
 if (cfg.auto) {
-	skapaHav(document.querySelector('.elementor header:has(h1)'), { farger: cfg.farger || {} });
+	// Ingen fördröjning: herointrot väntar på första bilden.
+	skapaHav(document.querySelector('.elementor header:has(h1)'), { farger: cfg.farger || {}, fordrojning: 0 });
 }

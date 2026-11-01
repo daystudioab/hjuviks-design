@@ -10,7 +10,8 @@
 	z-index: 1;
 }
 
-/* Havsytan ligger under allt innehåll i heron och tonar fram när den är redo. */
+/* Havsytan ligger under allt innehåll i heron och syns direkt när första bilden är ritad
+   (heron sveps fram först då, se rorelse.js). */
 .hjd-hav {
 	position: absolute;
 	inset: 0;
@@ -20,17 +21,10 @@
 	height: 100%;
 	pointer-events: none;
 	opacity: 0;
-	transition: opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hjd-hav.is-ready {
 	opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.hjd-hav {
-		transition: none;
-	}
 }
 
 /* Maskade rader i rubrikintrot – plats för å, ä, ö och nedstaplar. */
@@ -39,17 +33,30 @@
 	margin-bottom: -0.1em;
 }
 
-/* Rubriken döljs tills introt startar. Visas ändå efter 2,5 s om något fallerar. */
+/* Herointrot: heron är stängd i mitten och innehållet osynligt tills rorelse.js sveper upp
+   den (klassen hjd-intro-start tar över med inline-stilar). Om något fallerar öppnas allt
+   ändå efter 4 s. */
 @media (prefers-reduced-motion: no-preference) {
-	html.hjd-js .elementor header:has(h1) h1 {
-		visibility: hidden;
-		animation: hjd-visa 0s linear 2.5s forwards;
+	html.hjd-js .elementor header:has(h1):not(.hjd-intro-start) {
+		clip-path: inset(0% 50% 0% 50%);
+		animation: hjd-oppna 0s linear 4s forwards;
+	}
+
+	html.hjd-js .elementor header:has(h1):not(.hjd-intro-start) > *:not(.hjd-hav) {
+		opacity: 0;
+		animation: hjd-visa 0s linear 4s forwards;
+	}
+}
+
+@keyframes hjd-oppna {
+	to {
+		clip-path: none;
 	}
 }
 
 @keyframes hjd-visa {
 	to {
-		visibility: visible;
+		opacity: 1;
 	}
 }
 

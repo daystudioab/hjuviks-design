@@ -1,6 +1,6 @@
 /* Hjuviks Marina – rörelser (GSAP).
  * Tre motiverade moment:
- * 1. Heron: rubriken reser sig rad för rad när sidan öppnas.
+ * 1. Heron: sveps upp från mitten och ut när havsytan är redo, sedan tonas text och logga in.
  * 2. Citatet: orden får full färg i läsfart medan man scrollar.
  * 3. Bilder: öppnar sig när de kommer in i bild.
  * 4. Panorering i .hm-panorera-rutor.
@@ -40,45 +40,50 @@
 		var mm = gsap.matchMedia();
 
 		mm.add('(prefers-reduced-motion: no-preference)', function () {
-			// 1. Hero
-			if (h1) {
-				SplitText.create(h1, {
-					type: 'lines',
-					mask: 'lines',
-					linesClass: 'hjd-line',
-					autoSplit: true,
-					onSplit: function (self) {
-						gsap.set(h1, { visibility: 'visible' });
-						return gsap.from(self.lines, {
-							yPercent: 112,
-							duration: 1.15,
-							ease: 'expo.out',
-							stagger: 0.09,
-						});
-					},
+			// 1. Hero: vänta tills havsytan har ritat sin första bild (eller högst 1,5 s), svep
+			//    sedan upp heron från mitten och ut med clip-path, och tona därefter in allt
+			//    innehåll (logga, rubrik, ingress, knappar). CSS håller heron stängd tills dess.
+			if (hero) {
+				var innehall = Array.prototype.filter.call(hero.children, function (el) {
+					return !el.classList.contains('hjd-hav');
 				});
+				var radie = window.getComputedStyle(hero).borderTopLeftRadius || '0px';
+				var stangd = 'inset(0% 50% 0% 50% round ' + radie + ')';
+				var oppen = 'inset(0% 0% 0% 0% round ' + radie + ')';
 
-				var resten = [];
-				var inre = h1.parentElement;
-				Array.prototype.forEach.call(inre.children, function (el) {
-					if (el !== h1) {
-						resten.push(el);
-					}
+				// Elementors behållare har en CSS-övergång som annars släpar efter GSAP.
+				innehall.forEach(function (el) {
+					el.style.transition = 'none';
 				});
-				var legend = Array.prototype.slice.call(hero.querySelectorAll('.e-grid-base > *'));
-				// Elementors behållare har en CSS-övergång på transform som annars låser
-				// GSAP-rörelsen halvvägs. Stäng av den under introt och städa efteråt.
-				var utanOvergang = function (els) {
-					els.forEach(function (el) {
-						el.style.transition = 'none';
-					});
+				gsap.set(hero, { clipPath: stangd });
+				gsap.set(innehall, { autoAlpha: 0 });
+				hero.classList.add('hjd-intro-start');
+
+				var intro = gsap.timeline({ paused: true });
+				intro
+					.to(hero, { clipPath: oppen, duration: 1.4, ease: 'expo.inOut' })
+					.set(hero, { clearProps: 'clipPath' })
+					.to(innehall, {
+						autoAlpha: 1,
+						duration: 1,
+						ease: 'power2.out',
+						stagger: 0.08,
+						clearProps: 'opacity,visibility,transition',
+					}, '>-0.1');
+
+				var startat = false;
+				var starta = function () {
+					if (startat) {
+						return;
+					}
+					startat = true;
+					intro.play();
 				};
-				var stada = { clearProps: 'transform,transition' };
-				utanOvergang(resten);
-				utanOvergang(legend);
-				gsap.fromTo(resten, { y: 22, autoAlpha: 0 }, Object.assign({ y: 0, autoAlpha: 1, duration: 0.9, ease: 'power3.out', stagger: 0.08, delay: 0.35 }, stada));
-				if (legend.length) {
-					gsap.fromTo(legend, { y: 14, autoAlpha: 0 }, Object.assign({ y: 0, autoAlpha: 1, duration: 0.8, ease: 'power3.out', stagger: 0.06, delay: 0.6 }, stada));
+				if (hero.hasAttribute('data-hav-redo')) {
+					starta();
+				} else {
+					hero.addEventListener('hjd:hav-redo', starta, { once: true });
+					setTimeout(starta, 1500);
 				}
 			}
 
@@ -258,8 +263,8 @@
 		});
 
 		mm.add('(prefers-reduced-motion: reduce)', function () {
-			if (h1) {
-				gsap.set(h1, { visibility: 'visible' });
+			if (hero) {
+				hero.classList.add('hjd-intro-start');
 			}
 		});
 
