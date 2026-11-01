@@ -115,7 +115,8 @@
 		});
 
 		// 4. Panorering: en bild i en .hm-panorera-ruta glider långsamt så att rutan visar
-		//    bilden från höger kant till vänster kant (15 s), och tillbaka. Bilden är förankrad
+		//    bilden från höger kant till vänster kant (35 s), och tillbaka. Mjuk in- och
+		//    utbromsning i båda ändar. Bilder som är lika breda som rutan står still. Bilden är förankrad
 		//    till höger i CSS, så utan JS eller med minska rörelse visas startbilden.
 		mm.add('(prefers-reduced-motion: no-preference)', function () {
 			Array.prototype.forEach.call(document.querySelectorAll('.hm-panorera'), function (ruta) {
@@ -128,8 +129,9 @@
 				};
 				var tween = gsap.fromTo(img, { x: 0 }, {
 					x: avstand,
-					duration: 15,
+					duration: 35,
 					ease: 'sine.inOut',
+					force3D: true,
 					repeat: -1,
 					yoyo: true,
 					paused: true,
