@@ -65,3 +65,36 @@
 		scroll-behavior: smooth;
 	}
 }
+
+/* Glöd bakom en knapp (global klass hm-glod): ett suddigt sken i knappens egen
+ * färg som andas långsamt. Bara opacity och transform animeras, så det är billigt.
+ * Vid minska rörelse står skenet still. */
+.hm-glod::before {
+	content: "";
+	position: absolute;
+	inset: -3px;
+	z-index: -1;
+	border-radius: inherit;
+	background: #ffe8b8;
+	filter: blur(18px);
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.hm-glod::before {
+		animation: hjd-glod 5s ease-in-out infinite alternate;
+		will-change: opacity, transform;
+	}
+}
+
+@keyframes hjd-glod {
+	from {
+		opacity: 0.25;
+		transform: scale(0.97);
+	}
+	to {
+		opacity: 0.85;
+		transform: scale(1.07);
+	}
+}
