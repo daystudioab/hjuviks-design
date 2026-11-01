@@ -60,8 +60,10 @@
 				hero.classList.add('hjd-intro-start');
 
 				var intro = gsap.timeline({ paused: true });
+				// fromTo med båda värdena utskrivna: webbläsaren förkortar annars startvärdet
+				// (inset(0% 50%)) och GSAP parar då ihop fel siffror, så svepet går från vänster.
 				intro
-					.to(hero, { clipPath: oppen, duration: 1.4, ease: 'expo.inOut' })
+					.fromTo(hero, { clipPath: stangd }, { clipPath: oppen, duration: 1.4, ease: 'expo.inOut', immediateRender: false })
 					.set(hero, { clearProps: 'clipPath' })
 					.to(innehall, {
 						autoAlpha: 1,
