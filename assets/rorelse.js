@@ -8,7 +8,8 @@
  *    stycken i samma block som en enda löpande text.
  * 6. Paus: block med klassen hm-paus tonas in i scrollfart och stannar sedan en kort stund i
  *    fönstrets mitt medan sidan scrollar.
- * 7. Zoom: block med klassen hm-zoom börjar något större och zoomas på plats i scrollfart.
+ * 7. Zoom: block med klassen hm-zoom börjar något större och lite lutat och zoomas på plats
+ *    (0 grader) i scrollfart.
  * Allt stängs av vid "minska rörelse". */
 (function () {
 	'use strict';
@@ -223,8 +224,9 @@
 		// 6. Paus: ett .hm-paus-block fäster i fönstrets mitt en kort stund (45 % av fönstrets
 		//    höjd i scrollsträcka) medan sidan runt omkring fortsätter. Fästet räknas om först
 		//    (refreshPriority), så att utlösare längre ned tar hänsyn till det extra utrymmet.
-		// 7. Zoom: ett .hm-zoom-block börjar något större (högst 20 %, aldrig bredare än
-		//    fönstret) och zoomas ned till sin plats i takt med scrollen.
+		// 7. Zoom: ett .hm-zoom-block börjar något större (högst 20 %) och lutat 3 grader, och
+		//    zoomas ned och rätas upp till sin plats (0 grader) i takt med scrollen. Startläget
+		//    blir aldrig bredare än fönstret, inte ens med lutningen (ingen sidledsscroll).
 		//    Elementors behållare har en övergång på transform som skulle släpa efter scrollen,
 		//    så den stängs av. Utan JS eller med minska rörelse står allt bara på plats.
 		mm.add('(prefers-reduced-motion: no-preference)', function () {
@@ -276,16 +278,23 @@
 
 			gsap.utils.toArray('.hm-zoom').forEach(function (el) {
 				el.style.transition = 'none';
+				var lutning = -3;
 				var startskala = function () {
 					var bredd = el.offsetWidth || 1;
-					var ledigt = window.innerWidth / bredd;
+					var hojd = el.offsetHeight || 0;
+					var v = Math.abs(lutning) * Math.PI / 180;
+					// Bredden på den lutade rutan: b·cos v + h·sin v.
+					var lutadBredd = bredd * Math.cos(v) + hojd * Math.sin(v);
+					var ledigt = window.innerWidth / lutadBredd;
 					return Math.max(1, Math.min(1.2, ledigt));
 				};
 				gsap.fromTo(el, {
 					scale: startskala,
+					rotation: lutning,
 					transformOrigin: '50% 50%',
 				}, {
 					scale: 1,
+					rotation: 0,
 					ease: 'power2.out',
 					force3D: true,
 					scrollTrigger: {
