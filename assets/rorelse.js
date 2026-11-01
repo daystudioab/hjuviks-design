@@ -6,7 +6,8 @@
  * 4. Panorering i .hm-panorera-rutor.
  * 5. Textfyllnad: text med klassen hm-fyll är ljusgrå och fylls i ord för ord i scrollfart,
  *    stycken i samma block som en enda löpande text.
- * 6. Paus: block med klassen hm-paus stannar en kort stund i fönstrets mitt medan sidan scrollar.
+ * 6. Paus: block med klassen hm-paus tonas in i scrollfart och stannar sedan en kort stund i
+ *    fönstrets mitt medan sidan scrollar.
  * 7. Zoom: block med klassen hm-zoom börjar något större och zoomas på plats i scrollfart.
  * Allt stängs av vid "minska rörelse". */
 (function () {
@@ -17,6 +18,10 @@
 	}
 
 	gsap.registerPlugin(ScrollTrigger, SplitText);
+
+	// Mobilens adressfält ändrar fönsterhöjden när man scrollar. Räkna inte om allt då,
+	// det ger ryck i fästet och zoomen.
+	ScrollTrigger.config({ ignoreMobileResize: true });
 
 	var hero = document.querySelector('.elementor header:has(h1)');
 	var h1 = hero ? hero.querySelector('h1') : null;
@@ -225,6 +230,24 @@
 		mm.add('(prefers-reduced-motion: no-preference)', function () {
 			gsap.utils.toArray('.hm-paus').forEach(function (el) {
 				el.style.transition = 'none';
+				// Innehållet tonas in (och glider upp en aning) på väg mot mitten. Barnen
+				// animeras, inte själva blocket, så att fästet mäter blocket orört.
+				var barn = Array.prototype.slice.call(el.children);
+				barn.forEach(function (b) {
+					b.style.transition = 'none';
+				});
+				gsap.fromTo(barn, { autoAlpha: 0, y: 32 }, {
+					autoAlpha: 1,
+					y: 0,
+					ease: 'none',
+					force3D: true,
+					scrollTrigger: {
+						trigger: el,
+						start: 'top 88%',
+						end: 'center 52%',
+						scrub: 0.6,
+					},
+				});
 				ScrollTrigger.create({
 					trigger: el,
 					start: 'center center',
@@ -272,6 +295,21 @@
 
 		window.addEventListener('load', function () {
 			ScrollTrigger.refresh();
+		});
+
+		// Bilder som laddas sent (lazy loading) ändrar höjder efter load. Räkna om
+		// utlösarna en gång när de har laddats klart, annars hoppar fästet och zoomen.
+		var vantar = null;
+		var omrakna = function () {
+			clearTimeout(vantar);
+			vantar = setTimeout(function () {
+				ScrollTrigger.refresh();
+			}, 150);
+		};
+		Array.prototype.forEach.call(document.querySelectorAll('.elementor img'), function (img) {
+			if (!img.complete) {
+				img.addEventListener('load', omrakna, { once: true });
+			}
 		});
 	}
 

@@ -1,7 +1,8 @@
 /* Hjuviks Marina – ankarlänkar för one-page.
  * Elementor V4 kan inte sätta id på element, så ankarmålen märks med en global
  * klass: hm-ankare-<namn> blir id="<namn>" (t.ex. hm-ankare-batplatser → #batplatser).
- * Mjuk scroll sköts av CSS (scroll-behavior) och avståndet upptill av klassens scroll-margin-top. */
+ * Klick på #länkar scrollar mjukt hit (utan CSS scroll-behavior, som stör ScrollTrigger),
+ * och avståndet upptill tas från målets scroll-margin-top. */
 (function () {
 	'use strict';
 
@@ -10,6 +11,30 @@
 		var m = el.className.match(/(?:^|\s)hm-ankare-([a-z0-9-]+)/);
 		if (m && !el.id && !document.getElementById(m[1])) {
 			el.id = m[1];
+		}
+	});
+
+	// Mjuk scroll vid klick på länkar till ett ankare på samma sida.
+	var lugn = window.matchMedia('(prefers-reduced-motion: reduce)');
+	document.addEventListener('click', function (e) {
+		if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+			return;
+		}
+		var a = e.target.closest ? e.target.closest('a[href*="#"]') : null;
+		if (!a || a.target === '_blank' || a.pathname !== location.pathname || a.host !== location.host) {
+			return;
+		}
+		var id = decodeURIComponent(a.hash.slice(1));
+		var el = id ? document.getElementById(id) : null;
+		if (!el) {
+			return;
+		}
+		e.preventDefault();
+		var marginal = parseFloat(window.getComputedStyle(el).scrollMarginTop) || 0;
+		var y = el.getBoundingClientRect().top + window.pageYOffset - marginal;
+		window.scrollTo({ top: y, behavior: lugn.matches ? 'auto' : 'smooth' });
+		if (history.pushState) {
+			history.pushState(null, '', '#' + id);
 		}
 	});
 
