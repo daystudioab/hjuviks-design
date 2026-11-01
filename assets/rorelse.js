@@ -230,22 +230,31 @@
 		mm.add('(prefers-reduced-motion: no-preference)', function () {
 			gsap.utils.toArray('.hm-paus').forEach(function (el) {
 				el.style.transition = 'none';
-				// Innehållet tonas in (och glider upp en aning) på väg mot mitten. Barnen
-				// animeras, inte själva blocket, så att fästet mäter blocket orört.
+				// Innehållet tonas in (och glider upp en aning) när det kommer in nedifrån och är
+				// helt tydligt när tre rader syns i fönstret. Barnen animeras, inte själva blocket,
+				// så att fästet mäter blocket orört.
 				var barn = Array.prototype.slice.call(el.children);
 				barn.forEach(function (b) {
 					b.style.transition = 'none';
 				});
-				gsap.fromTo(barn, { autoAlpha: 0, y: 32 }, {
+				var treRader = function () {
+					var text = el.querySelector('p') || el;
+					var rad = parseFloat(window.getComputedStyle(text).lineHeight) || 40;
+					return Math.round(rad * 3);
+				};
+				gsap.fromTo(barn, { autoAlpha: 0, y: 16 }, {
 					autoAlpha: 1,
 					y: 0,
 					ease: 'none',
 					force3D: true,
 					scrollTrigger: {
 						trigger: el,
-						start: 'top 88%',
-						end: 'center 52%',
-						scrub: 0.6,
+						start: 'top bottom',
+						end: function () {
+							return 'top bottom-=' + treRader();
+						},
+						scrub: 0.25,
+						invalidateOnRefresh: true,
 					},
 				});
 				ScrollTrigger.create({
@@ -256,7 +265,8 @@
 					},
 					pin: true,
 					pinSpacing: true,
-					anticipatePin: 1,
+					// Ingen anticipatePin: med vanlig scroll fäster den blocket en bildruta för
+					// tidigt, vilket syns som ett ryck på 10–15 px när pausen börjar.
 					refreshPriority: 1,
 					invalidateOnRefresh: true,
 				});
