@@ -96,14 +96,15 @@ html.hjd-js {
 }
 
 /* Dragspel (e-accordion) utan egen ikonbild: en rund knapp med plus som blir minus när frågan är öppen.
- * Färgen följer ikonens textfärg (color) i Elementor. */
+ * Färgerna kan bytas per sida eller sektion med variablerna --hjd-fraga-*. */
 .elementor .e-accordion-item-base > summary .e-accordion-item-icon-base:not(:has(svg)) {
 	position: relative;
+	color: var(--hjd-fraga-ikon, #002A71);
 	flex: 0 0 32px;
 	width: 32px;
 	height: 32px;
 	border-radius: 50%;
-	background: #EEF0EE;
+	background: var(--hjd-fraga-bg, rgba(0, 42, 113, 0.08));
 	transition: background-color 0.2s, color 0.2s;
 }
 
@@ -125,8 +126,8 @@ html.hjd-js {
 }
 
 .elementor .e-accordion-item-base[open] > summary .e-accordion-item-icon-base:not(:has(svg)) {
-	background: #9B2C1F;
-	color: #FFFFFF;
+	background: var(--hjd-fraga-bg-oppen, #002A71);
+	color: var(--hjd-fraga-ikon-oppen, #FFFFFF);
 }
 
 .elementor .e-accordion-item-base[open] > summary .e-accordion-item-icon-base:not(:has(svg))::after {
@@ -137,4 +138,17 @@ html.hjd-js {
 	.elementor .e-accordion-item-base > summary .e-accordion-item-icon-base:not(:has(svg))::after {
 		transition: none;
 	}
+}
+
+.elementor .e-accordion-item-base > summary {
+	list-style: none;
+}
+
+.elementor .e-accordion-item-base > summary::-webkit-details-marker {
+	display: none;
+}
+
+.elementor .e-accordion-item-base > summary:focus-visible {
+	outline: 2px solid var(--hjd-fraga-bg-oppen, #002A71);
+	outline-offset: 4px;
 }
