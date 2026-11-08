@@ -94,3 +94,47 @@ html.hjd-js {
 		transform: scale(1.07);
 	}
 }
+
+/* Dragspel (e-accordion) utan egen ikonbild: en rund knapp med plus som blir minus när frågan är öppen.
+ * Färgen följer ikonens textfärg (color) i Elementor. */
+.elementor .e-accordion-item-base > summary .e-accordion-item-icon-base:not(:has(svg)) {
+	position: relative;
+	flex: 0 0 32px;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	background: #EEF0EE;
+	transition: background-color 0.2s, color 0.2s;
+}
+
+.elementor .e-accordion-item-base > summary .e-accordion-item-icon-base:not(:has(svg))::before,
+.elementor .e-accordion-item-base > summary .e-accordion-item-icon-base:not(:has(svg))::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 12px;
+	height: 2px;
+	margin: -1px 0 0 -6px;
+	background: currentColor;
+	transition: transform 0.25s;
+}
+
+.elementor .e-accordion-item-base > summary .e-accordion-item-icon-base:not(:has(svg))::after {
+	transform: rotate(90deg);
+}
+
+.elementor .e-accordion-item-base[open] > summary .e-accordion-item-icon-base:not(:has(svg)) {
+	background: #9B2C1F;
+	color: #FFFFFF;
+}
+
+.elementor .e-accordion-item-base[open] > summary .e-accordion-item-icon-base:not(:has(svg))::after {
+	transform: rotate(0deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.elementor .e-accordion-item-base > summary .e-accordion-item-icon-base:not(:has(svg))::after {
+		transition: none;
+	}
+}
