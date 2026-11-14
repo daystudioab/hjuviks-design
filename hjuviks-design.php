@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Hjuviks Marina – Design och rörelse
- * Description: Havsyta i startsidans hero (Three.js) med valbara färger under Utseende → Havsyta, rörelser för rubriker, citat och bilder (GSAP) samt ankarlänkar för one-page. Respekterar "minska rörelse" i besökarens inställningar.
- * Version: 1.21.0
+ * Description: Rörelser för hero, rubriker, citat och bilder (GSAP) samt ankarlänkar för one-page. Respekterar "minska rörelse" i besökarens inställningar.
+ * Version: 1.22.0
  * Update URI: https://github.com/daystudioab/hjuviks-design
  * Author: Studio Day
  * Requires at least: 6.0
@@ -31,10 +31,8 @@ if ( defined( 'STUDIODAY_GITHUB_TOKEN' ) && STUDIODAY_GITHUB_TOKEN ) {
 	$hjd_uppdaterare->setAuthentication( STUDIODAY_GITHUB_TOKEN );
 }
 
-define( 'HJD_VERSION', '1.21.0' );
+define( 'HJD_VERSION', '1.22.0' );
 define( 'HJD_URL', plugin_dir_url( __FILE__ ) );
-
-require_once __DIR__ . '/includes/havsyta-farger.php';
 
 /**
  * Kör inte i Elementor-redigeraren eller dess förhandsvisning.
@@ -57,9 +55,7 @@ add_action( 'wp_head', function () {
 	if ( ! hjd_is_frontend() ) {
 		return;
 	}
-	// hjd-webgl: havsytan kommer att ritas, så heron visar havets grundfärg (inte reservtoningen)
-	// tills första bilden är klar.
-	echo "<script>(function(d){d.classList.add('hjd-js');try{var c=document.createElement('canvas');if(c.getContext('webgl2')||c.getContext('webgl')){d.classList.add('hjd-webgl');}}catch(e){}})(document.documentElement);</script>\n";
+	echo "<script>document.documentElement.classList.add('hjd-js');</script>\n";
 }, 1 );
 
 add_action( 'wp_enqueue_scripts', function () {
@@ -74,23 +70,4 @@ add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_script( 'hjd-scrolltrigger', HJD_URL . 'assets/vendor/ScrollTrigger.min.js', array( 'hjd-gsap' ), '3.15.0', true );
 	wp_enqueue_script( 'hjd-splittext', HJD_URL . 'assets/vendor/SplitText.min.js', array( 'hjd-gsap' ), '3.15.0', true );
 	wp_enqueue_script( 'hjd-rorelse', HJD_URL . 'assets/rorelse.js', array( 'hjd-gsap', 'hjd-scrolltrigger', 'hjd-splittext' ), HJD_VERSION, true );
-
-	if ( is_front_page() ) {
-		wp_enqueue_script( 'hjd-hav', HJD_URL . 'assets/hav.js', array(), HJD_VERSION, true );
-		wp_add_inline_script(
-			'hjd-rorelse',
-			'window.HJD_HAV = ' . wp_json_encode( array( 'auto' => true, 'farger' => hjd_hav_farger() ) ) . ';',
-			'before'
-		);
-	}
 } );
-
-/**
- * hav.js är en ES-modul (importerar Three.js relativt).
- */
-add_filter( 'script_loader_tag', function ( $tag, $handle, $src ) {
-	if ( 'hjd-hav' === $handle || 'hjd-hav-admin' === $handle ) {
-		return '<script type="module" src="' . esc_url( $src ) . '" id="' . esc_attr( $handle ) . '-js"></script>' . "\n";
-	}
-	return $tag;
-}, 10, 3 );

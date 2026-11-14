@@ -1,6 +1,6 @@
 /* Hjuviks Marina – rörelser (GSAP).
  * Tre motiverade moment:
- * 1. Heron: text och logga tonas in när havsytan är redo.
+ * 1. Heron: text och logga tonas in när sidan har laddat sina typsnitt.
  * 2. Citatet: orden får full färg i läsfart medan man scrollar.
  * 3. Bilder: öppnar sig när de kommer in i bild.
  * 4. Panorering i .hm-panorera-rutor.
@@ -47,13 +47,10 @@
 		var mm = gsap.matchMedia();
 
 		mm.add('(prefers-reduced-motion: no-preference)', function () {
-			// 1. Hero: vänta tills havsytan har ritat sin första bild (eller högst 1,5 s) och tona
-			//    sedan in allt innehåll (logga, rubrik, ingress, knappar). Heron själv syns direkt
-			//    med havets grundfärg. CSS håller innehållet osynligt tills dess.
+			// 1. Hero: tona in allt innehåll (bild, logga, rubrik, ingress, knappar). CSS håller
+			//    innehållet osynligt tills dess.
 			if (hero) {
-				var innehall = Array.prototype.filter.call(hero.children, function (el) {
-					return !el.classList.contains('hjd-hav');
-				});
+				var innehall = Array.prototype.slice.call(hero.children);
 
 				// Elementors behållare har en CSS-övergång som annars släpar efter GSAP.
 				innehall.forEach(function (el) {
@@ -62,29 +59,13 @@
 				gsap.set(innehall, { autoAlpha: 0 });
 				hero.classList.add('hjd-intro-start');
 
-				var intro = gsap.to(innehall, {
+				gsap.to(innehall, {
 					autoAlpha: 1,
 					duration: 1.1,
 					ease: 'power2.out',
 					stagger: 0.08,
-					paused: true,
 					clearProps: 'opacity,visibility,transition',
 				});
-
-				var startat = false;
-				var starta = function () {
-					if (startat) {
-						return;
-					}
-					startat = true;
-					intro.play();
-				};
-				if (hero.hasAttribute('data-hav-redo')) {
-					starta();
-				} else {
-					hero.addEventListener('hjd:hav-redo', starta, { once: true });
-					setTimeout(starta, 1500);
-				}
 			}
 
 			// 2. Citatet läses fram i scrollfart
