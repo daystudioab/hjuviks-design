@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hjuviks Marina – Design och rörelse
  * Description: Rörelser för hero, rubriker, citat och bilder (GSAP) samt ankarlänkar för one-page. Respekterar "minska rörelse" i besökarens inställningar.
- * Version: 1.23.1
+ * Version: 1.24.0
  * Update URI: https://github.com/daystudioab/hjuviks-design
  * Author: Studio Day
  * Requires at least: 6.0
@@ -31,7 +31,7 @@ if ( defined( 'STUDIODAY_GITHUB_TOKEN' ) && STUDIODAY_GITHUB_TOKEN ) {
 	$hjd_uppdaterare->setAuthentication( STUDIODAY_GITHUB_TOKEN );
 }
 
-define( 'HJD_VERSION', '1.23.1' );
+define( 'HJD_VERSION', '1.24.0' );
 define( 'HJD_URL', plugin_dir_url( __FILE__ ) );
 
 /**
@@ -66,6 +66,7 @@ add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_style( 'hjd-design', HJD_URL . 'assets/design.css', array(), HJD_VERSION );
 
 	wp_enqueue_script( 'hjd-ankare', HJD_URL . 'assets/ankare.js', array(), HJD_VERSION, true );
+	wp_enqueue_script( 'hjd-dragspel', HJD_URL . 'assets/dragspel.js', array(), HJD_VERSION, true );
 	wp_enqueue_script( 'hjd-gsap', HJD_URL . 'assets/vendor/gsap.min.js', array(), '3.15.0', true );
 	wp_enqueue_script( 'hjd-scrolltrigger', HJD_URL . 'assets/vendor/ScrollTrigger.min.js', array( 'hjd-gsap' ), '3.15.0', true );
 	wp_enqueue_script( 'hjd-splittext', HJD_URL . 'assets/vendor/SplitText.min.js', array( 'hjd-gsap' ), '3.15.0', true );
