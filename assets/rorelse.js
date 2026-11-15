@@ -288,7 +288,8 @@
 
 		// 8. Tona in: block med klassen hm-tona-in tonas in och glider upp 24 px när de kommer in
 		//    i bild, en gång. Block som kommer in samtidigt (rubrik, ingress, prislista) tonas in
-		//    efter varandra med 80 ms mellanrum. Minska rörelse: bara en kort toning, ingen rörelse.
+		//    efter varandra med 80 ms mellanrum. Med klassen hm-tona-in-sent dröjer blocket 0,3 s till.
+		//    Minska rörelse: bara en kort toning, ingen rörelse.
 		function tonaIn(rorelse) {
 			var block = gsap.utils.toArray('.hm-tona-in');
 			if (!block.length) {
@@ -303,14 +304,18 @@
 				start: 'top 88%',
 				once: true,
 				onEnter: function (inkomna) {
-					gsap.to(inkomna, {
-						autoAlpha: 1,
-						y: 0,
-						duration: rorelse ? 0.9 : 0.4,
-						ease: rorelse ? 'power3.out' : 'power1.out',
-						stagger: rorelse ? 0.08 : 0,
-						overwrite: true,
-						clearProps: 'opacity,visibility,transform,transition',
+					inkomna.forEach(function (el, i) {
+						// hm-tona-in-sent: väntar ytterligare 0,3 s innan blocket tonas in.
+						var extra = el.classList.contains('hm-tona-in-sent') ? 0.3 : 0;
+						gsap.to(el, {
+							autoAlpha: 1,
+							y: 0,
+							duration: rorelse ? 0.9 : 0.4,
+							delay: extra + (rorelse ? i * 0.08 : 0),
+							ease: rorelse ? 'power3.out' : 'power1.out',
+							overwrite: true,
+							clearProps: 'opacity,visibility,transform,transition',
+						});
 					});
 				},
 			});
