@@ -11,6 +11,8 @@
  * 7. Zoom: block med klassen hm-zoom börjar något större och lite lutat och zoomas på plats
  *    (0 grader) i scrollfart.
  * 8. Tona in: block med klassen hm-tona-in tonas in och glider upp en aning när de kommer in i bild.
+ * 9. Parallax: block med klassen hm-parallax tonas in, glider uppåt något snabbare än sidan och
+ *    växer en aning till full storlek, allt i scrollfart.
  * Bilder i block med klassen hm-stilla rör sig inte alls (ingen öppning med clip-path).
  * Allt stängs av vid "minska rörelse". */
 (function () {
@@ -282,6 +284,38 @@
 						scrub: 1,
 						invalidateOnRefresh: true,
 					},
+				});
+			});
+
+			// 9. Parallax: under hela passagen genom fönstret glider blocket från 60 px under sin
+			//    plats till 60 px ovanför (alltså lite snabbare än sidan, uppåt). Under första
+			//    halvan växer det från 92 % till full storlek, och under första tredjedelen tonas
+			//    det in. scrub 0.6 ger en liten mjuk eftersläpning utan att kännas sen.
+			gsap.utils.toArray('.hm-parallax').forEach(function (el) {
+				el.style.transition = 'none';
+				var tl = gsap.timeline({
+					scrollTrigger: {
+						trigger: el,
+						start: 'top bottom',
+						end: 'bottom top',
+						scrub: 0.6,
+						invalidateOnRefresh: true,
+					},
+				});
+				tl.fromTo(el, { y: 60 }, { y: -60, ease: 'none', duration: 1, force3D: true }, 0)
+					.fromTo(el, { scale: 0.92, transformOrigin: '50% 50%' }, { scale: 1, ease: 'power2.out', duration: 0.5 }, 0)
+					.fromTo(el, { autoAlpha: 0 }, { autoAlpha: 1, ease: 'none', duration: 0.33 }, 0);
+			});
+		});
+
+		// 9b. Parallax vid minska rörelse: ingen rörelse eller skalning, bara toningen.
+		mm.add('(prefers-reduced-motion: reduce)', function () {
+			gsap.utils.toArray('.hm-parallax').forEach(function (el) {
+				el.style.transition = 'none';
+				gsap.fromTo(el, { autoAlpha: 0 }, {
+					autoAlpha: 1,
+					ease: 'none',
+					scrollTrigger: { trigger: el, start: 'top bottom', end: 'top 65%', scrub: true },
 				});
 			});
 		});
