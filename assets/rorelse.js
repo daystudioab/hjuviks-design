@@ -181,6 +181,8 @@
 					// Bara vanliga mellanslag delar ord. Ett hårt mellanslag (U+00A0) i texten
 					// håller ihop orden på samma rad, till exempel "i dag" sist i ett stycke.
 					wordDelimiter: ' ',
+					// Annars gör SplitText om hårda mellanslag till vanliga.
+					reduceWhiteSpace: false,
 					wordsClass: 'hjd-fyll-ord',
 					charsClass: 'hjd-fyll-tecken',
 					onSplit: function (self) {
