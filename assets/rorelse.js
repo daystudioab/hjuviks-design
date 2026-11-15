@@ -10,6 +10,7 @@
  *    fönstrets mitt medan sidan scrollar.
  * 7. Zoom: block med klassen hm-zoom börjar något större och lite lutat och zoomas på plats
  *    (0 grader) i scrollfart.
+ * 8. Tona in: block med klassen hm-tona-in tonas in och glider upp en aning när de kommer in i bild.
  * Bilder i block med klassen hm-stilla rör sig inte alls (ingen öppning med clip-path).
  * Allt stängs av vid "minska rörelse". */
 (function () {
@@ -285,10 +286,45 @@
 			});
 		});
 
+		// 8. Tona in: block med klassen hm-tona-in tonas in och glider upp 24 px när de kommer in
+		//    i bild, en gång. Block som kommer in samtidigt (rubrik, ingress, prislista) tonas in
+		//    efter varandra med 80 ms mellanrum. Minska rörelse: bara en kort toning, ingen rörelse.
+		function tonaIn(rorelse) {
+			var block = gsap.utils.toArray('.hm-tona-in');
+			if (!block.length) {
+				return;
+			}
+			block.forEach(function (el) {
+				// Elementors behållare har en CSS-övergång som annars släpar efter GSAP.
+				el.style.transition = 'none';
+			});
+			gsap.set(block, rorelse ? { autoAlpha: 0, y: 24 } : { autoAlpha: 0 });
+			ScrollTrigger.batch(block, {
+				start: 'top 88%',
+				once: true,
+				onEnter: function (inkomna) {
+					gsap.to(inkomna, {
+						autoAlpha: 1,
+						y: 0,
+						duration: rorelse ? 0.9 : 0.4,
+						ease: rorelse ? 'power3.out' : 'power1.out',
+						stagger: rorelse ? 0.08 : 0,
+						overwrite: true,
+						clearProps: 'opacity,visibility,transform,transition',
+					});
+				},
+			});
+		}
+
+		mm.add('(prefers-reduced-motion: no-preference)', function () {
+			tonaIn(true);
+		});
+
 		mm.add('(prefers-reduced-motion: reduce)', function () {
 			if (hero) {
 				hero.classList.add('hjd-intro-start');
 			}
+			tonaIn(false);
 		});
 
 		window.addEventListener('load', function () {
