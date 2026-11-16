@@ -73,7 +73,6 @@ add_action( 'wp_head', function () {
 			array(
 				'@type'          => 'LocalBusiness',
 				'@id'            => $url . '#hamn',
-				'additionalType' => 'https://www.wikidata.org/wiki/Q721207',
 				'name'           => 'Hjuviks Marina',
 				'legalName'      => 'Hjuviks Marina Förvaltning AB',
 				'description'    => $besk,
