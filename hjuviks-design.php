@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hjuviks Marina – Design och rörelse
  * Description: Rörelser för hero, rubriker, citat och bilder (GSAP) samt ankarlänkar för one-page. Respekterar "minska rörelse" i besökarens inställningar.
- * Version: 1.26.1
+ * Version: 1.27.0
  * Update URI: https://github.com/daystudioab/hjuviks-design
  * Author: Studio Day
  * Requires at least: 6.0
@@ -31,8 +31,10 @@ if ( defined( 'STUDIODAY_GITHUB_TOKEN' ) && STUDIODAY_GITHUB_TOKEN ) {
 	$hjd_uppdaterare->setAuthentication( STUDIODAY_GITHUB_TOKEN );
 }
 
-define( 'HJD_VERSION', '1.26.1' );
+define( 'HJD_VERSION', '1.27.0' );
 define( 'HJD_URL', plugin_dir_url( __FILE__ ) );
+
+require_once __DIR__ . '/includes/versioner.php';
 
 /**
  * Kör inte i Elementor-redigeraren eller dess förhandsvisning.
