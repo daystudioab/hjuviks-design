@@ -13,6 +13,8 @@
  * 8. Tona in: block med klassen hm-tona-in tonas in och glider upp en aning när de kommer in i bild.
  * 9. Parallax: block med klassen hm-parallax tonas in, glider uppåt något snabbare än sidan och
  *    växer en aning till full storlek, allt i scrollfart.
+ * 10. Bildblock: .hm-block öppnar sig ur en rundad ram, bakgrunden landar i full storlek och
+ *    rubrik, text och knapp glider upp efter varandra.
  * Bilder i block med klassen hm-stilla rör sig inte alls (ingen öppning med clip-path).
  * Allt stängs av vid "minska rörelse". */
 (function () {
@@ -323,6 +325,77 @@
 					scrollTrigger: { trigger: el, start: 'top bottom', end: 'top 65%', scrub: true },
 				});
 			});
+		});
+
+		// 10. Bildblock (.hm-block, t.ex. "Söker du båtplats?" och "Vinterplats"): när blocken
+		//     kommer in i bild öppnar sig rutan från en lite mindre, rundad ram (clip-path) medan
+		//     bakgrundsbilden landar från 112 % till full storlek, och sedan glider rubrik, text och
+		//     knapp upp efter varandra. Block som kommer in samtidigt startar med 120 ms mellanrum.
+		//     Allt körs en gång och är tidsstyrt (inte scrub), så det känns lugnt även vid snabb
+		//     scroll. Efteråt rensas transform och clip-path så att hovringen i design.css tar över.
+		//     Minska rörelse: blocket tonas bara in.
+		function bildblock(rorelse) {
+			var block = gsap.utils.toArray('.hm-block');
+			if (!block.length) {
+				return;
+			}
+			block.forEach(function (el) {
+				var bild = el.querySelector('.hm-block-bild');
+				var inre = el.querySelector('.hm-block-inre');
+				var delar = inre ? Array.prototype.slice.call(inre.children) : [];
+				var rund = window.getComputedStyle(el).borderTopLeftRadius || '0px';
+				el.hjdBlock = { bild: bild, delar: delar, rund: rund };
+				el.style.transition = 'none';
+				if (bild) {
+					bild.style.transition = 'none';
+				}
+				if (rorelse) {
+					gsap.set(el, { autoAlpha: 0, y: 32, clipPath: 'inset(7% 5% 0% 5% round ' + rund + ')' });
+					if (bild) {
+						gsap.set(bild, { scale: 1.12, transformOrigin: '50% 60%' });
+					}
+					gsap.set(delar, { autoAlpha: 0, y: 20 });
+				} else {
+					gsap.set(el, { autoAlpha: 0 });
+				}
+			});
+			ScrollTrigger.batch(block, {
+				start: 'top 85%',
+				once: true,
+				onEnter: function (inkomna) {
+					inkomna.forEach(function (el, i) {
+						var d = el.hjdBlock;
+						if (!rorelse) {
+							gsap.to(el, { autoAlpha: 1, duration: 0.4, ease: 'power1.out', clearProps: 'opacity,visibility,transition' });
+							return;
+						}
+						var tl = gsap.timeline({
+							delay: i * 0.12,
+							onComplete: function () {
+								gsap.set(el, { clearProps: 'clipPath,transform,opacity,visibility,transition' });
+								if (d.bild) {
+									gsap.set(d.bild, { clearProps: 'transform,transition' });
+								}
+								gsap.set(d.delar, { clearProps: 'opacity,visibility,transform' });
+							},
+						});
+						tl.to(el, { autoAlpha: 1, duration: 0.5, ease: 'power2.out' }, 0)
+							.to(el, { y: 0, clipPath: 'inset(0% 0% 0% 0% round ' + d.rund + ')', duration: 1.1, ease: 'power4.out' }, 0);
+						if (d.bild) {
+							tl.to(d.bild, { scale: 1, duration: 1.6, ease: 'power3.out' }, 0);
+						}
+						tl.to(d.delar, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.08 }, 0.35);
+					});
+				},
+			});
+		}
+
+		mm.add('(prefers-reduced-motion: no-preference)', function () {
+			bildblock(true);
+		});
+
+		mm.add('(prefers-reduced-motion: reduce)', function () {
+			bildblock(false);
 		});
 
 		// 8. Tona in: block med klassen hm-tona-in tonas in och glider upp 24 px när de kommer in

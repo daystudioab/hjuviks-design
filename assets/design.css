@@ -143,3 +143,25 @@ html.hjd-js {
 	outline: 2px solid var(--hjd-fraga-bg-oppen, var(--djupvatten, #121314));
 	outline-offset: 4px;
 }
+
+/* Bildblock (.hm-block): vid hovring zoomar bakgrundsbilden in en aning, och knappen trycks in
+ * när man klickar. Hovringen bara med mus, så att pekskärmar inte fastnar i hovringsläget. */
+@media (prefers-reduced-motion: no-preference) {
+	.elementor .hm-block > .hm-block-bild {
+		transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+	}
+
+	.elementor .hm-block .hm-knapp {
+		transition: background-color 0.15s, color 0.15s, border-color 0.15s, transform 0.16s cubic-bezier(0.23, 1, 0.32, 1);
+	}
+
+	.elementor .hm-block .hm-knapp:active {
+		transform: scale(0.97);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+	.elementor .hm-block:hover > .hm-block-bild {
+		transform: scale(1.035);
+	}
+}
