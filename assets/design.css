@@ -79,7 +79,10 @@ html.hjd-js {
 }
 
 /* Dragspel (e-accordion) utan egen ikonbild: en rund knapp med plus som blir minus när frågan är öppen.
- * Färgerna följer kitets variabel djupvatten och kan bytas per sida eller sektion med --hjd-fraga-*.
+ * Öppen fråga har samma färger som den valda fliken i prislistan (mörkblå botten, ljusgul symbol,
+ * blå kant) och kan bytas per sida eller sektion med --hjd-fraga-*.
+ * Rörelsen: plusset snurrar ett kvarts varv. Det liggande strecket hamnar stående och krymper bort,
+ * det stående hamnar liggande och blir minuset. Samma väg tillbaka när frågan stängs.
  * Medan ett svar stänger (data-hjd-stanger, dragspel.js) visar knappen redan plus. */
 .elementor .e-accordion-item-base > summary .e-accordion-item-icon-base:not(:has(svg)) {
 	position: relative;
@@ -89,7 +92,8 @@ html.hjd-js {
 	height: 32px;
 	border-radius: 50%;
 	background: var(--hjd-fraga-bg, rgba(18, 19, 20, 0.06));
-	transition: background-color 0.26s cubic-bezier(0.23, 1, 0.32, 1), color 0.26s cubic-bezier(0.23, 1, 0.32, 1);
+	box-shadow: inset 0 0 0 1.5px transparent;
+	transition: background-color 0.28s cubic-bezier(0.23, 1, 0.32, 1), color 0.28s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.28s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .elementor .e-accordion-item-base > summary .e-accordion-item-icon-base:not(:has(svg))::before,
@@ -102,7 +106,7 @@ html.hjd-js {
 	height: 2px;
 	margin: -1px 0 0 -6px;
 	background: currentColor;
-	transition: transform 0.26s cubic-bezier(0.23, 1, 0.32, 1);
+	transition: transform 0.28s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.2s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .elementor .e-accordion-item-base > summary .e-accordion-item-icon-base:not(:has(svg))::after {
@@ -117,15 +121,22 @@ html.hjd-js {
 }
 
 .elementor .e-accordion-item-base[open]:not([data-hjd-stanger]) > summary .e-accordion-item-icon-base:not(:has(svg)) {
-	background: var(--hjd-fraga-bg-oppen, var(--djupvatten, #121314));
-	color: var(--hjd-fraga-ikon-oppen, #FFFFFF);
+	background: var(--hjd-fraga-bg-oppen, #051D36);
+	color: var(--hjd-fraga-ikon-oppen, #FFE8B8);
+	box-shadow: inset 0 0 0 1.5px var(--hjd-fraga-kant-oppen, #002A71);
+}
+
+.elementor .e-accordion-item-base[open]:not([data-hjd-stanger]) > summary .e-accordion-item-icon-base:not(:has(svg))::before {
+	transform: rotate(90deg) scaleX(0);
+	opacity: 0;
 }
 
 .elementor .e-accordion-item-base[open]:not([data-hjd-stanger]) > summary .e-accordion-item-icon-base:not(:has(svg))::after {
-	transform: rotate(0deg);
+	transform: rotate(180deg);
 }
 
 @media (prefers-reduced-motion: reduce) {
+	.elementor .e-accordion-item-base > summary .e-accordion-item-icon-base:not(:has(svg))::before,
 	.elementor .e-accordion-item-base > summary .e-accordion-item-icon-base:not(:has(svg))::after {
 		transition: none;
 	}
