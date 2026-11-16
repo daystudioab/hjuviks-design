@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hjuviks Marina – Design och rörelse
  * Description: Rörelser för hero, rubriker, citat och bilder (GSAP) samt ankarlänkar för one-page. Respekterar "minska rörelse" i besökarens inställningar.
- * Version: 1.28.0
+ * Version: 1.29.0
  * Update URI: https://github.com/daystudioab/hjuviks-design
  * Author: Studio Day
  * Requires at least: 6.0
@@ -31,7 +31,7 @@ if ( defined( 'STUDIODAY_GITHUB_TOKEN' ) && STUDIODAY_GITHUB_TOKEN ) {
 	$hjd_uppdaterare->setAuthentication( STUDIODAY_GITHUB_TOKEN );
 }
 
-define( 'HJD_VERSION', '1.28.0' );
+define( 'HJD_VERSION', '1.29.0' );
 define( 'HJD_URL', plugin_dir_url( __FILE__ ) );
 
 require_once __DIR__ . '/includes/versioner.php';
@@ -73,4 +73,17 @@ add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_script( 'hjd-scrolltrigger', HJD_URL . 'assets/vendor/ScrollTrigger.min.js', array( 'hjd-gsap' ), '3.15.0', true );
 	wp_enqueue_script( 'hjd-splittext', HJD_URL . 'assets/vendor/SplitText.min.js', array( 'hjd-gsap' ), '3.15.0', true );
 	wp_enqueue_script( 'hjd-rorelse', HJD_URL . 'assets/rorelse.js', array( 'hjd-gsap', 'hjd-scrolltrigger', 'hjd-splittext' ), HJD_VERSION, true );
+} );
+
+/**
+ * Hemskärmsikon för iPhone och iPad: en egen ikon med heltäckande marinblå bakgrund.
+ * Webbplatsikonen (rund, genomskinliga hörn) får annars svarta hörn på hemskärmen.
+ */
+add_filter( 'site_icon_meta_tags', function ( $taggar ) {
+	foreach ( $taggar as $i => $tagg ) {
+		if ( false !== strpos( $tagg, 'apple-touch-icon' ) ) {
+			$taggar[ $i ] = sprintf( '<link rel="apple-touch-icon" href="%s" />', esc_url( HJD_URL . 'assets/apple-touch-icon.png?ver=' . HJD_VERSION ) );
+		}
+	}
+	return $taggar;
 } );
